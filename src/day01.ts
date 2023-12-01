@@ -1002,7 +1002,7 @@ xsftnb6mvgqxv17four
 7gqqvzkvzbvxghxonekqvsteight
 nineninekfp49`;
 
-function fixInput(line: string) {
+function fixInput(line: string): unknown[] {
   if (line.length === 0) return [];
 
     if (line.startsWith("one"  )) return [1, ...fixInput(line.substring(1))]
@@ -1028,19 +1028,22 @@ function fixInput(line: string) {
     return fixInput(line.substring(1));
 }
 
-let data = input
+const data = input
   .trim()
   .split(/\r?\n/)
+  ;
+
+const part1 = data
+  .map(x => x.replace(/[a-z]/g, ""))
+  .map(a => parseInt(`${a[0]}${a[a.length-1]}`))
+  .reduce((prev, curr) => prev+curr, 0);
+
+const part2 = data
   .map(x => fixInput(x))
   .map(x => x.join(""))
   .map(x => x.replace(/[a-z]/g, ""))
   .map(a => parseInt(`${a[0]}${a[a.length-1]}`))
-  ;
-
-console.log(data);
-
-let part1 = data.reduce((prev, curr) => prev+curr, 0);
-let part2 = 0;
+  .reduce((prev, curr) => prev+curr, 0);
 
 console.log("Part 1:", part1);
 console.log("Part 2:", part2);
