@@ -1,4 +1,6 @@
 import {start, finish} from './util.ts';
+import { wetzls } from './libs/smallest-enclosing-circle.ts';
+
 start();
 
 const input = `(44, -28), (-71, -92), (89, 60), (95, 79)
@@ -40,9 +42,13 @@ const part1 = data
   .map(radii => Math.max(...radii))
   .reduce((prev, curr) => prev + curr, 0)
 
-const part2 = 0;
+const part2 = data
+  .map(line => line.map(c => ({x: c[0], y: c[1]})))
+  .map(line => wetzls(line))
+  .map(circle => circle.r)
+  .reduce((prev, curr) => prev + curr, 0)
 
 console.log("Part 1:", Math.trunc(part1));
-console.log("Part 2:", part2);
+console.log("Part 2:", Math.trunc(part2));
 
 finish();
