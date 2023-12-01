@@ -44,9 +44,14 @@ const part1 = data
 
 const part2 = data
   .map(line => line.map(c => ({x: c[0], y: c[1]})))
-  .map(line => wetzls(line))
-  .map(circle => circle.r)
-  .reduce((prev, curr) => prev + curr, 0)
+  .map(line => ({circle: wetzls(line), points: line}))
+  .reduce((prev, data) => {
+    // See also: https://codepen.io/jeroenheijmans/pen/ExrdJJL?editors=0010
+    // Spit out some planck.js code:
+    console.log(`spawnPackage(${JSON.stringify(data.circle)}, ${JSON.stringify(data.points)})`);
+
+    return prev + data.circle.r;
+  }, 0)
 
 console.log("Part 1:", Math.trunc(part1));
 console.log("Part 2:", Math.trunc(part2));
