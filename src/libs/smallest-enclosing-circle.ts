@@ -27,14 +27,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-export function wetzls(points) {
+interface Point {
+  x: number;
+  y: number;
+}
+interface Circle extends Point {
+  r: number;
+}
+
+export function wetzls(points: Point[]) {
   // clone and then shuffle the points
   const clonedPoints = points.slice();
   shuffle(clonedPoints);
   return mec(clonedPoints, points.length, [], 0);
 }
 
-function shuffle(a) {
+function shuffle(a: unknown[]) {
   let j, x, i;
   for (i = a.length - 1; i > 0; i--) {
     j = Math.floor(Math.random() * (i + 1));
@@ -45,7 +53,7 @@ function shuffle(a) {
   return a;
 }
 
-function mec(points, n, boundary, b) {
+function mec(points: Point[], n: number, boundary: Point[], b: number): Circle {
   let localCircle = null;
 
   if (b === 3) localCircle = calcCircle3(boundary[0], boundary[1], boundary[2]);
@@ -66,7 +74,7 @@ function mec(points, n, boundary, b) {
   return localCircle;
 }
 
-function calcCircle3(p1, p2, p3) {
+function calcCircle3(p1: Point, p2: Point, p3: Point) {
   const p1x = p1.x,
     p1y = p1.y,
     p2x = p2.x,
@@ -90,7 +98,7 @@ function calcCircle3(p1, p2, p3) {
   };
 }
 
-function calcCircle2(p1, p2) {
+function calcCircle2(p1: Point, p2: Point) {
   const p1x = p1.x,
     p1y = p1.y,
     p2x = p2.x,
@@ -105,6 +113,6 @@ function calcCircle2(p1, p2) {
   };
 }
 
-function isInCircle(p, c) {
+function isInCircle(p: Point, c: Circle) {
   return (c.x - p.x) * (c.x - p.x) + (c.y - p.y) * (c.y - p.y) <= c.r * c.r;
 }
