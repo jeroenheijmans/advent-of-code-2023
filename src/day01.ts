@@ -1002,31 +1002,37 @@ xsftnb6mvgqxv17four
 7gqqvzkvzbvxghxonekqvsteight
 nineninekfp49`;
 
-function isNumeric(str) {
-  if (typeof str != "string") return false // we only process strings!  
-  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
-}
-
 function fixInput(line: string) {
-  for (let n=0; n<line.length; n++) {
-    if (line.startsWith("six",   n)) return fixInput(line.replace("six",   "6"));
-    if (line.startsWith("four",  n)) return fixInput(line.replace("four",  "4"));
-    if (line.startsWith("eight", n)) return fixInput(line.replace("eight", "8"));
-    if (line.startsWith("three", n)) return fixInput(line.replace("three", "3"));
-    if (line.startsWith("five",  n)) return fixInput(line.replace("five",  "5"));
-    if (line.startsWith("seven", n)) return fixInput(line.replace("seven", "7"));
-    if (line.startsWith("two",   n)) return fixInput(line.replace("two",   "2"));
-    if (line.startsWith("nine",  n)) return fixInput(line.replace("nine",  "9"));
-    if (line.startsWith("one",   n)) return fixInput(line.replace("one",   "1"));
-  }
-  return line;
+  if (line.length === 0) return [];
+
+    if (line.startsWith("one"  )) return [1, ...fixInput(line.substring(1))]
+    if (line.startsWith("two"  )) return [2, ...fixInput(line.substring(1))]
+    if (line.startsWith("three")) return [3, ...fixInput(line.substring(1))]
+    if (line.startsWith("four" )) return [4, ...fixInput(line.substring(1))]
+    if (line.startsWith("five" )) return [5, ...fixInput(line.substring(1))]
+    if (line.startsWith("six"  )) return [6, ...fixInput(line.substring(1))]
+    if (line.startsWith("seven")) return [7, ...fixInput(line.substring(1))]
+    if (line.startsWith("eight")) return [8, ...fixInput(line.substring(1))]
+    if (line.startsWith("nine" )) return [9, ...fixInput(line.substring(1))]
+  
+    if (line.startsWith("1")) return [1, ...fixInput(line.substring(1))]
+    if (line.startsWith("2")) return [2, ...fixInput(line.substring(1))]
+    if (line.startsWith("3")) return [3, ...fixInput(line.substring(1))]
+    if (line.startsWith("4")) return [4, ...fixInput(line.substring(1))]
+    if (line.startsWith("5")) return [5, ...fixInput(line.substring(1))]
+    if (line.startsWith("6")) return [6, ...fixInput(line.substring(1))]
+    if (line.startsWith("7")) return [7, ...fixInput(line.substring(1))]
+    if (line.startsWith("8")) return [8, ...fixInput(line.substring(1))]
+    if (line.startsWith("9")) return [9, ...fixInput(line.substring(1))]
+
+    return fixInput(line.substring(1));
 }
 
 let data = input
   .trim()
   .split(/\r?\n/)
   .map(x => fixInput(x))
+  .map(x => x.join(""))
   .map(x => x.replace(/[a-z]/g, ""))
   .map(a => parseInt(`${a[0]}${a[a.length-1]}`))
   ;
