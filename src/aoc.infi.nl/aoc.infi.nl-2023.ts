@@ -1,5 +1,5 @@
-import {start, finish} from './util.ts';
-import { wetzls } from './libs/smallest-enclosing-circle.ts';
+import {start, finish} from '../util.ts';
+import { wetzls } from './smallest-enclosing-circle.ts';
 
 start();
 
