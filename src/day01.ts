@@ -1011,8 +1011,8 @@ function isNumeric(str) {
 let data = input
   .trim()
   .split(/\r?\n/)
-  .map(x => x.split("").filter(y => isNumeric(y)).map(y => parseInt(y)))
-  .map(a => a[0] + a[a.length-1])
+  .map(x => x.replace(/[a-z]/g, ""))
+  .map(a => parseInt(`${a[0]}${a[a.length-1]}`))
   ;
 
 console.log(data);
