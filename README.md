@@ -18,7 +18,7 @@ deno run --watch --allow-read ./src/day01.ts
 
 Here's what I learned (or noticed) each day.
 
-1. TODO
+1. Ambiguity is part of life.
 2. TODO
 3. TODO
 4. TODO
