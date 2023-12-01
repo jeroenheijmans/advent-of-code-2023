@@ -1008,9 +1008,25 @@ function isNumeric(str) {
          !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
+function fixInput(line: string) {
+  for (let n=0; n<line.length; n++) {
+    if (line.startsWith("six",   n)) return fixInput(line.replace("six",   "6"));
+    if (line.startsWith("four",  n)) return fixInput(line.replace("four",  "4"));
+    if (line.startsWith("eight", n)) return fixInput(line.replace("eight", "8"));
+    if (line.startsWith("three", n)) return fixInput(line.replace("three", "3"));
+    if (line.startsWith("five",  n)) return fixInput(line.replace("five",  "5"));
+    if (line.startsWith("seven", n)) return fixInput(line.replace("seven", "7"));
+    if (line.startsWith("two",   n)) return fixInput(line.replace("two",   "2"));
+    if (line.startsWith("nine",  n)) return fixInput(line.replace("nine",  "9"));
+    if (line.startsWith("one",   n)) return fixInput(line.replace("one",   "1"));
+  }
+  return line;
+}
+
 let data = input
   .trim()
   .split(/\r?\n/)
+  .map(x => fixInput(x))
   .map(x => x.replace(/[a-z]/g, ""))
   .map(a => parseInt(`${a[0]}${a[a.length-1]}`))
   ;
