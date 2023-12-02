@@ -8,3 +8,7 @@ export function start(maxRunTime = 5000) {
 export function finish() {
   clearTimeout(timeout);
 }
+
+export function add(a: number, b: number) {
+  return a + b;
+}
