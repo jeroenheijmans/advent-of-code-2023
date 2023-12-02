@@ -19,7 +19,7 @@ deno run --watch --allow-read ./src/day01.ts
 Here's what I learned (or noticed) each day.
 
 1. Ambiguity is part of life.
-2. TODO
+2. Parsing data is hard even if it's clean data!
 3. TODO
 4. TODO
 5. TODO
