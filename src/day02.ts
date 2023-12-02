@@ -110,31 +110,28 @@ const data = input
   .map(line => line.split(": "))
   .map(parts => ({
     id: parseInt(parts[0]),
-    sets: parts[1].split("; ").map(x => x.split(", ").map(y => ({count: parseInt(y.split(" ")[0]), color: y.split(" ")[1]})))
+    sets: parts[1].split(/[,;]/g).map(m => m.trim().split(" ")).map(m => ({
+      count: parseInt(m[0]), 
+      color: m[1]
+    }))
   }))
   ;
 
 const part1 = data
   .filter(game => 
-    game.sets.every(set => 
-      set.filter(s => s.color === "red").every(s => s.count <= 12)
-      &&
-      set.filter(s => s.color === "green").every(s => s.count <= 13)
-      &&
-      set.filter(s => s.color === "blue").every(s => s.count <= 14)
-    )
+    game.sets.filter(s => s.color === "red").every(s => s.count <= 12)
+    && game.sets.filter(s => s.color === "green").every(s => s.count <= 13)
+    && game.sets.filter(s => s.color === "blue").every(s => s.count <= 14)
   )
   .map(g => g.id)
   .reduce(add, 0)
 
 const part2 = data
-  .map(game => game.sets.reduce((result, next) =>{
-    result.red = Math.max(result.red, next.find(x => x.color === "red")?.count || 0);
-    result.green = Math.max(result.green, next.find(x => x.color === "green")?.count || 0);
-    result.blue = Math.max(result.blue, next.find(x => x.color === "blue")?.count || 0);
-    return result;
-  }, {red:0, green:0, blue:0}))
-  .map(x => x.red * x.green * x.blue)
+  .map(g =>
+    Math.max(0, ...g.sets.filter(s => s.color === "red").map(s => s.count))
+    * Math.max(0, ...g.sets.filter(s => s.color === "green").map(s => s.count))
+    * Math.max(0, ...g.sets.filter(s => s.color === "blue").map(s => s.count))
+  )
   .reduce(add, 0)
 
 console.log("Part 1:", part1);
