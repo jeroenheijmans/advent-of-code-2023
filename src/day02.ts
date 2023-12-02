@@ -127,7 +127,15 @@ const part1 = data
   .map(g => g.id)
   .reduce(add, 0)
 
-const part2 = ""
+const part2 = data
+  .map(game => game.sets.reduce((result, next) =>{
+    result.red = Math.max(result.red, next.find(x => x.color === "red")?.count || 0);
+    result.green = Math.max(result.green, next.find(x => x.color === "green")?.count || 0);
+    result.blue = Math.max(result.blue, next.find(x => x.color === "blue")?.count || 0);
+    return result;
+  }, {red:0, green:0, blue:0}))
+  .map(x => x.red * x.green * x.blue)
+  .reduce(add, 0)
 
 console.log("Part 1:", part1);
 console.log("Part 2:", part2);
