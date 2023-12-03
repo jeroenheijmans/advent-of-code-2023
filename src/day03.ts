@@ -29,24 +29,26 @@ data.forEach((line, y) => {
   let nrX = 0;
 
   line.split("").forEach((char, x) => {
-    if (char === ".") {
-      if (nr) {
-        const key = `${nrX};${y}`;
-        objects[key] = {nr, x: nrX, y, char: ""};
-      }
-      nr = "";
-      return;
-    }
-
     if (char.match(/[0-9]/)) {
       if (!nr) nrX = x;
       nr = `${nr}${char}`;
       return;
     }
 
+    if (nr) {
+      const key = `${nrX};${y}`;
+      objects[key] = {nr, x: nrX, y, char: ""};
+    }
+
+    nr = "";
+    nrX = x;
+
+    if (char === ".") {
+      return;
+    }
+
     const key = `${x};${y}`;
     objects[key] = {nr, x, y, char};
-    nr = "";
   })
 
   if (nr) {
@@ -71,15 +73,15 @@ for(const [key, val] of Object.entries(objects)) {
   }
 }
 
-const part1 = [...relevant].map(x => parseInt(x.nr)).reduce(add, 0);
+// console.log(objects)
 
-const relevant2 = new Set();
+const part1 = [...relevant].map(x => parseInt(x.nr)).reduce(add, 0);
 
 const part2 = Object.values(objects)
   .filter(o => o.char === "*")
   .map(o => ({
     gear: o,
-    parts: Object.values(objects).filter(val => !val.char).filter(val => {
+    parts: Object.values(objects).filter(val => val.nr).filter(val => {
       for (let dx = -1; dx < val.nr.length + 1; dx++) {
         for (let dy = -1; dy < 2; dy++) {
           if (val.x + dx === o.x && val.y + dy === o.y) return true;
@@ -89,6 +91,7 @@ const part2 = Object.values(objects)
     })
   }))
   .filter(x => x.parts.length === 2)
+  // .map(x => x.gear)
   .map(x => parseInt(x.parts[0].nr) * parseInt(x.parts[1].nr))
   .reduce(add, 0)
 ;
