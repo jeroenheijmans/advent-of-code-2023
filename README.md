@@ -20,7 +20,7 @@ Here's what I learned (or noticed) each day.
 
 1. Ambiguity is part of life.
 2. Parsing data is hard even if it's clean data!
-3. TODO
+3. Bugs are like ninja's.
 4. TODO
 5. TODO
 6. TODO
