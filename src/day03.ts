@@ -79,7 +79,7 @@ const part2 = Object.values(objects)
   .filter(o => o.char === "*")
   .map(o => ({
     gear: o,
-    parts: Object.values(objects).filter(val => val.nr).filter(val => {
+    parts: Object.values(objects).filter(val => !val.char).filter(val => {
       for (let dx = -1; dx < val.nr.length + 1; dx++) {
         for (let dy = -1; dy < 2; dy++) {
           if (val.x + dx === o.x && val.y + dy === o.y) return true;
