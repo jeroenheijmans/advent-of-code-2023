@@ -26,19 +26,20 @@ const objects: Record<string, any> = {};
 let nr = "";
 data.forEach((line, y) => {
   nr = "";
+  let nrX = 0;
 
   line.split("").forEach((char, x) => {
     if (char === ".") {
       if (nr) {
-        const idx = line.indexOf(nr);
-        const key = `${idx};${y}`;
-        objects[key] = {nr, x: idx, y, char: ""};
+        const key = `${nrX};${y}`;
+        objects[key] = {nr, x: nrX, y, char: ""};
       }
       nr = "";
       return;
     }
 
     if (char.match(/[0-9]/)) {
+      if (!nr) nrX = x;
       nr = `${nr}${char}`;
       return;
     }
@@ -49,9 +50,8 @@ data.forEach((line, y) => {
   })
 
   if (nr) {
-    const idx = line.indexOf(nr);
-    const key = `${idx};${y}`;
-    objects[key] = {nr, x: idx, y};
+    const key = `${nrX};${y}`;
+    objects[key] = {nr, x: nrX, y};
     nr = "";
   }
 })
@@ -63,13 +63,15 @@ for(const [key, val] of Object.entries(objects)) {
     for (let dx = -1; dx < val.nr.length + 1; dx++) {
       for (let dy = -1; dy < 2; dy++) {
         const targetKey = `${val.x + dx};${val.y + dy}`;
-        if (objects.hasOwnProperty(targetKey) && objects[targetKey].char) {
+        if (objects[targetKey] && objects[targetKey].char) {
           relevant.add(val);
         }
       }
     }
   }
 }
+
+// console.log(Object.values(objects).filter(o => !o.char && !relevant.has(o)))
 
 const part1 = [...relevant].map(x => parseInt(x.nr)).reduce(add, 0);
 
