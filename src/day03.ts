@@ -71,11 +71,27 @@ for(const [key, val] of Object.entries(objects)) {
   }
 }
 
-// console.log(Object.values(objects).filter(o => !o.char && !relevant.has(o)))
-
 const part1 = [...relevant].map(x => parseInt(x.nr)).reduce(add, 0);
 
-const part2 = undefined;
+const relevant2 = new Set();
+
+const part2 = Object.values(objects)
+  .filter(o => o.char === "*")
+  .map(o => ({
+    gear: o,
+    parts: Object.values(objects).filter(val => val.nr).filter(val => {
+      for (let dx = -1; dx < val.nr.length + 1; dx++) {
+        for (let dy = -1; dy < 2; dy++) {
+          if (val.x + dx === o.x && val.y + dy === o.y) return true;
+        }
+      }
+      return false;
+    })
+  }))
+  .filter(x => x.parts.length === 2)
+  .map(x => parseInt(x.parts[0].nr) * parseInt(x.parts[1].nr))
+  .reduce(add, 0)
+;
 
 console.log("Part 1:", part1);
 console.log("Part 2:", part2);
