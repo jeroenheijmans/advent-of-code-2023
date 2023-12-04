@@ -12,33 +12,28 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 
 input = Deno.readTextFileSync("./src/inputs/day04.txt");
 
-interface ICard {
-  id: number;
-  mine: number[];
-  winners: number[];
-}
-
 const cards = input
   .trim()
   .split(/\r?\n/)
   .filter(x => x)
-  .map(x => { 
-    const parts = x.replace("Card ", "").split(/[|:]/g);
-    return {
-      id: parseInt(parts[0]),
-      mine: parts[1].trim().split(" ").map(n => parseInt(n)),
-      winners: parts[2].trim().split(/\s+/g).map(n => parseInt(n)),
-    } as ICard;
-   })
+  .map(x => x.replace("Card ", "").split(/[|:]/g).map(x => x.trim()))
+  .map(([id, mine, winners]) => ({
+      id: parseInt(id),
+      mine: mine.split(" ").map(n => parseInt(n)),
+      winners: winners.split(/\s+/g).map(n => parseInt(n)),
+    }
+   ))
    .map(c => ({ ...c, found: c.mine.filter(n => c.winners.includes(n)).length }))
-   .map(c => ({ ...c, points: c.found === 0 ? 0 : parseInt(`1${"0".repeat(c.found - 1)}`, 2) }))
   ;
 
 const part1 = cards
-  .map(c => c.points)
+  .map(c => c.found === 0 ? 0 : parseInt(`1${"0".repeat(c.found - 1)}`, 2))
   .reduce(add, 0)
 
-const nrOfCopies = cards.reduce((curr, prev) => { curr[prev.id] = 1; return curr; }, {} as Record<number, number>);
+const nrOfCopies = cards.reduce((result, next) => {
+  result[next.id] = 1;
+  return result;
+}, {} as Record<number, number>);
 
 cards.forEach(card => {
   const max = card.id + card.found;
