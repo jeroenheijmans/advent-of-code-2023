@@ -30,15 +30,24 @@ const cards = input
       winners: parts[2].trim().split(/\s+/g).map(n => parseInt(n)),
     } as ICard;
    })
+   .map(c => ({ ...c, found: c.mine.filter(n => c.winners.includes(n)).length }))
+   .map(c => ({ ...c, points: c.found === 0 ? 0 : parseInt(`1${"0".repeat(c.found - 1)}`, 2) }))
   ;
 
 const part1 = cards
-  .map(c => c.mine.filter(n => c.winners.includes(n)).length)
-  .map(count => count === 0 ? 0 : parseInt(`1${"0".repeat(count - 1)}`, 2))
+  .map(c => c.points)
   .reduce(add, 0)
 
+const nrOfCopies = cards.reduce((curr, prev) => { curr[prev.id] = 1; return curr; }, {} as Record<number, number>);
 
-const part2 = 0;
+cards.forEach(card => {
+  const max = card.id + card.found;
+  for (let i = card.id + 1; i <= max; i++) {
+    nrOfCopies[i] = (nrOfCopies[i] || 0) + nrOfCopies[card.id];
+  }
+});
+
+const part2 = Object.values(nrOfCopies).reduce(add, 0);
 
 console.log("Part 1:", part1);
 console.log("Part 2:", part2);
