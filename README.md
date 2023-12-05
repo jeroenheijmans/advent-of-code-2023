@@ -22,7 +22,7 @@ Here's what I learned (or noticed) each day.
 2. Parsing data is hard even if it's clean data!
 3. Bugs are like ninja's.
 4. Go slow to go fast.
-5. TODO
+5. Paint is a great coding support tool.
 6. TODO
 7. TODO
 8. TODO
