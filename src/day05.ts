@@ -78,12 +78,12 @@ data.slice(1).forEach(line => {
 
 const items = seeds.map(nr => ({type: "seed", nr: nr}))
 
-while (items.some(i => i.type !== "location")) {
-  items.forEach((item, idx) => {
-    let map = maps.find(m => m.from === item.type) as Map;
-    let range = map.ranges.find(m => item.nr >= m.source && item.nr <= m.end);
-    if (range) items[idx].nr = item.nr + range.diff;
-    items[idx].type = map.to;
+while (items[0].type !== "location") {
+  items.forEach(item => {
+    const map = maps.find(m => m.from === item.type) as Map;
+    const range = map.ranges.find(m => item.nr >= m.source && item.nr <= m.end);
+    if (range) item.nr = item.nr + range.diff;
+    item.type = map.to;
   })
 }
 
@@ -93,7 +93,6 @@ interface Slice {
   type: string;
   from: number;
   to: number;
-  count: number;
 }
 
 let slices: Slice[] = [];
@@ -103,19 +102,16 @@ for (let i = 0; i < seeds.length; i += 2) {
     type: "seed",
     from: seeds[i],
     to: seeds[i] + seeds[i + 1] - 1,
-    count: seeds[i + 1],
   })
 }
 
-while (slices.some(s => s.type !== "location")) {
-  let newSlices: Slice[] = [];
+while (slices[0].type !== "location") {
+  const newSlices: Slice[] = [];
 
-  slices.forEach((slice, idx) => {
-    // console.log("Considering", slice)
-
-    let map = maps.find(m => m.from === slice.type) as Map;
-    let loRange = map.ranges.find(r => slice.from >= r.source && slice.from <= r.end);
-    let hiRange = map.ranges.find(r => slice.to >= r.source && slice.from <= r.end);
+  slices.forEach(slice => {
+    const map = maps.find(m => m.from === slice.type) as Map;
+    const loRange = map.ranges.find(r => slice.from >= r.source && slice.from <= r.end);
+    const hiRange = map.ranges.find(r => slice.to >= r.source && slice.from <= r.end);
 
     slice.type = map.to;
 
@@ -130,13 +126,11 @@ while (slices.some(s => s.type !== "location")) {
         from: slice.from + loRange.diff,
         to: loRange.end,
         type: map.to,
-        count: loRange.end - slice.from - loRange.diff,
       })
       newSlices.push({
         from: loRange.end + 1,
         to: slice.to,
         type: map.to,
-        count: slice.to - loRange.end - 1,
       })
     }
 
@@ -145,13 +139,11 @@ while (slices.some(s => s.type !== "location")) {
         from: slice.from,
         to: hiRange.target,
         type: map.to,
-        count: hiRange.target - slice.from,
       })
       newSlices.push({
         from: hiRange.target,
         to: slice.to + hiRange.diff,
         type: map.to,
-        count: slice.to + hiRange.diff - hiRange.target,
       })
     }
 
@@ -160,19 +152,16 @@ while (slices.some(s => s.type !== "location")) {
         from: slice.from + loRange.diff,
         to: loRange.end,
         type: map.to,
-        count: loRange.end - slice.from - loRange.diff,
       })
       newSlices.push({
         from: loRange.end + 1,
         to: hiRange.target - 1,
         type: map.to,
-        count: (hiRange.target - 1) - (loRange.end + 1),
       })
       newSlices.push({
         from: hiRange.target,
         to: slice.to + hiRange.diff,
         type: map.to,
-        count: slice.to + hiRange.diff - hiRange.target,
       })
     }
 
@@ -188,8 +177,6 @@ while (slices.some(s => s.type !== "location")) {
 
   slices = newSlices
 }
-
-// console.log(slices);
 
 const part2 = Math.min(...slices.map(s => s.from))
 
