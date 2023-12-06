@@ -4,8 +4,8 @@ Solutions to the [Advent of Code 2023](https://adventofcode.com/2023) edition by
 
 ## Running
 
-```sh
-deno run  --allow-read ./src/main.ts
+```psh
+./run.ps1
 ```
 
 or
