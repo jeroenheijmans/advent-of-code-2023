@@ -23,7 +23,7 @@ Here's what I learned (or noticed) each day.
 3. Bugs are like ninja's.
 4. Go slow to go fast.
 5. Paint is a great coding support tool.
-6. TODO
+6. Turns out mathematics *can* be useful.
 7. TODO
 8. TODO
 9. TODO
