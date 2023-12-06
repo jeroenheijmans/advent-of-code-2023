@@ -14,6 +14,17 @@ export function finish() {
   clearTimeout(timeout);
 }
 
+export async function checkTimeout() {
+  // Make the process that calls this function switch threads
+  // so we allow the start/finish timeout check to run. This
+  // is a poor-man's hack to give the `start(...)` setTimeout
+  // a chance to run if needed.
+  //
+  // Might be better to just synchronously check if the script
+  // has timed out here, but oh well, this is AoC. :-)
+  await new Promise(resolve => setTimeout(resolve));
+}
+
 export function add(a: number, b: number) {
   return a + b;
 }
