@@ -37,29 +37,26 @@ const data = input
 
 const [times, targets] = data.map(x => x.split(/\s+/g).map(n => parseInt(n)))
 
-const waysToWin: number[] = []
+const waysToWin = times.map(_ => 0)
 
-times.forEach((time, idx) => {
-  waysToWin.push(0);
-  const target = targets[idx];
-
+times.forEach((time, index) => {
+  const target = targets[index];
   for (let t = 0; t < time; t++) {
-    const dist = (time - t) * t
-    if (dist > target) waysToWin[idx]++
+    const distance = (time - t) * t
+    if (distance > target) waysToWin[index]++
   }
 })
 
 const part1 = waysToWin.reduce(multiply, 1)
 
 const time = parseInt(data[0].replace(/\s/g, ""))
-const dist = parseInt(data[1].replace(/\s/g, ""))
+const target = parseInt(data[1].replace(/\s/g, ""))
 
-const target = dist
 let part2 = 0
 
 for (let t = 0; t < time; t++) {
-  const dist = (time - t) * t
-  if (dist > target) part2++
+  const distance = (time - t) * t
+  if (distance > target) part2++
 }
 
 console.log("Part 1:", part1)
