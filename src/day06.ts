@@ -15,9 +15,8 @@ const data = input
   .split(/\r?\n/)
   .map(x => x.trim())
   .filter(x => x)
-  .map(x => x.split(/\s+/g).map(n => parseInt(n)))
 
-const [times, targets] = data;
+const [times, targets] = data.map(x => x.split(/\s+/g).map(n => parseInt(n)));
 
 const waysToWin: number[] = []
 
@@ -32,7 +31,17 @@ times.forEach((time, idx) => {
 })
 
 const part1 = waysToWin.reduce(multiply, 1);
-const part2 = 0
+
+const time = parseInt(data[0].replace(/\s/g, ""))
+const dist = parseInt(data[1].replace(/\s/g, ""))
+
+const target = dist
+let part2 = 0
+
+for (let t = 0; t < time; t++) {
+  const dist = (time - t) * t
+  if (dist > target) part2++
+}
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
