@@ -8,6 +8,25 @@ Distance:  9  40  200
 
 input = Deno.readTextFileSync("./src/inputs/day06.txt")
 
+/*
+ *  Right from the start it was clear that there was
+ *  a somewhat simple math formula to calculate the
+ *  result (with some extra programming to handle
+ *  clipping to whole numbers).
+ *  
+ *  Remembering how this bit of math works was more
+ *  time for part 1 than just brute forcing it.
+ * 
+ *  Took a gamble to try and brute force part 2 as
+ *  well, and turned out it could be done in <100ms.
+ *  Even had some bifurcation optimization ready for
+ *  the case it didn't.
+ * 
+ *  Now I'm leaving my solution as is: I don't want to
+ *  refactor based on what Reddit or Wikipedia tells
+ *  me what the Math algorithm to solve this is.
+ */
+
 const data = input
   .trim()
   .replace("Time:", "")
@@ -16,7 +35,7 @@ const data = input
   .map(x => x.trim())
   .filter(x => x)
 
-const [times, targets] = data.map(x => x.split(/\s+/g).map(n => parseInt(n)));
+const [times, targets] = data.map(x => x.split(/\s+/g).map(n => parseInt(n)))
 
 const waysToWin: number[] = []
 
@@ -25,12 +44,12 @@ times.forEach((time, idx) => {
   const target = targets[idx];
 
   for (let t = 0; t < time; t++) {
-    const dist = (time - t) * t;
-    if (dist > target) waysToWin[idx]++;
+    const dist = (time - t) * t
+    if (dist > target) waysToWin[idx]++
   }
 })
 
-const part1 = waysToWin.reduce(multiply, 1);
+const part1 = waysToWin.reduce(multiply, 1)
 
 const time = parseInt(data[0].replace(/\s/g, ""))
 const dist = parseInt(data[1].replace(/\s/g, ""))
