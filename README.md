@@ -24,7 +24,7 @@ Here's what I learned (or noticed) each day.
 4. Go slow to go fast.
 5. Paint is a great coding support tool.
 6. Turns out mathematics *can* be useful.
-7. TODO
+7. Jokers are wild!
 8. TODO
 9. TODO
 10. TODO
