@@ -39,7 +39,7 @@ function getHandType(hand: number[]) {
 
   if (groupCount === 1) return 1; // Five of a kind
   if (groupCount === 2) {
-    if (parts[0].length === 1 || parts[1].length === 4) return 2; // Four or a kind
+    if (parts[0].length === 1 || parts[0].length === 4) return 2; // Four or a kind
     return 3; // Full house
   }
   if (groupCount === 3) {
