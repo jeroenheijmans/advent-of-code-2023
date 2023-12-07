@@ -77,30 +77,28 @@ function replaceJokers(hand: number[], distinctOtherCards: Set<number>): number[
   const idx = hand.indexOf(11);
   if (idx < 0) return hand;
 
-  return [...distinctOtherCards.values()].map(x => {
+  return [...distinctOtherCards].map(x => {
       const newHand = [];
       for (let i=0; i<5; i++) {
         newHand.push(i === idx ? x : hand[i]);
       }
       const best = replaceJokers(newHand, distinctOtherCards);
-      // console.log("Considering", best);
-      return {hand: best, type: getHandType(best), bid: -1};
+      return { hand: best, type: getHandType(best), bid: -1 };
     })
-    // .map(a => { console.log(a); return a; })
     .toSorted(handStrengthComparer)
-    .toReversed()[0].hand;
+    .at(-1)?.hand as number[];
 }
 
 const part2 = data
-  .map(entry => ({
-    ...entry,
-    replacedHand: replaceJokers(entry.hand, new Set(entry.hand.filter(c => c !== 11)))
-  }))
-  .map(entry => ({
-    ...entry,
-    type: getHandType(entry.replacedHand),
-    hand: entry.hand.map(c => c === 11 ? 0 : c),
-  }))
+  .map(entry => {
+    const replacedHand = replaceJokers(entry.hand, new Set(entry.hand.filter(c => c !== 11)));
+    return {
+      ...entry,
+      hand: entry.hand.map(c => c === 11 ? 0 : c), // Place joker at the end, value-wise
+      replacedHand,
+      type: getHandType(replacedHand),
+    };
+  })
   .toSorted(handStrengthComparer)
   .map((entry, index) => entry.bid * (index + 1))
   .reduce(add, 0)
