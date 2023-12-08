@@ -54,7 +54,8 @@ while (current && !current.isPart1EndNode) {
   current = nodes[current[turn]] as ILocation
 }
 
-let x = 1
+let part2 = BigInt(1)
+
 Object.values(nodes)
   .filter(node => node.isPart2StartNode)
   .forEach(node => {
@@ -72,12 +73,10 @@ Object.values(nodes)
       i %= nav.length
       current = nodes[current[turn]]
     }
-    console.log((path.length - i) / 269)
-    x *= (path.length - i) / 269
+    console.log(path.length, ">>>", (path.length - i) / nav.length)
     console.log()
+    part2 = part2 * BigInt(path.length)
   })
-
-const part2 = x + 6
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
