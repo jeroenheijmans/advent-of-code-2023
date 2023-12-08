@@ -20,13 +20,22 @@ const data = input
   .trim()
   .split(/\r?\n\r?\n/)
 
-const nav = data[0].split("")
+interface ILocation {
+  from: string;
+  "L": string
+  "R": string
+  isPart1EndNode: boolean;
+  isPart2EndNode: boolean;
+  isPart2StartNode: boolean;
+}
+
+const nav = data[0].split("") as ("L"|"R")[]
 const map = data[1]
   .split(/\r?\n/)
   .map(x => x.replace(" =", "").replace(/[(),]/g, "").split(" "))
   .reduce((result, next) => {
     result[next[0]] = {
-      "from": next[0],
+      from: next[0],
       "L": next[1],
       "R": next[2],
       isPart1EndNode: next[0] === "ZZZ",
@@ -34,10 +43,10 @@ const map = data[1]
       isPart2StartNode: next[0].endsWith("A"),
     };
     return result
-  }, {} as any)
+  }, {} as Record<string, ILocation>)
 
 
-function pathLen(locations: any[], endNodeProp = "isPart1EndNode") {
+function pathLen(locations: ILocation[], endNodeProp: "isPart1EndNode"|"isPart2EndNode") {
   let result = 0
   let i = 0
   const len = nav.length
@@ -59,10 +68,10 @@ function pathLen(locations: any[], endNodeProp = "isPart1EndNode") {
 
 const path2Locations = Object.values(map).filter(n => n.isPart2StartNode)
 
-// const part1 = pathLen(map["AAA"]);
-const part2 = pathLen(path2Locations, "isPart2EndNode") // Math.max(...part2Journeys)
+const part1 = pathLen([map["AAA"]], "isPart1EndNode")
+const part2 = path2Locations // pathLen(path2Locations, "isPart2EndNode")
 
-// console.log("Part 1:", part1)
+console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
 finish()
