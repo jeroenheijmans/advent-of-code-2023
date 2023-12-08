@@ -54,29 +54,44 @@ while (current && !current.isPart1EndNode) {
   current = nodes[current[turn]] as ILocation
 }
 
-let part2 = BigInt(1)
+let part2 = 1
+let items: number[] = []
 
 Object.values(nodes)
   .filter(node => node.isPart2StartNode)
   .forEach(node => {
-    const path: any[] = []
+    const path: string[] = []
 
     let current = node
-    let i = 0
+    let i = 0, step = 0, seen = 0
     while (true) {
-      if (current.isPart2EndNode) console.log(i, " ====> ", current.key)
+      if (current.isPart2EndNode) console.log(i, " ====> ", current.key, `(step = ${step})`)
+      if (current.isPart2EndNode) seen++
       const tuple = `${i};${current.key}`
-      if (path.includes(tuple)) console.log("Finding repetition at", tuple)
-      if (path.includes(tuple)) break
+      // if (path.includes(tuple)) console.log("Finding repetition at", tuple)
+      // if (path.includes(tuple)) break
+      if (seen > 0) break
       path.push(tuple)
       const turn = nav[i++]
       i %= nav.length
       current = nodes[current[turn]]
+      step++
     }
+    items.push(step)
     console.log(path.length, ">>>", (path.length - i) / nav.length)
     console.log()
-    part2 = part2 * BigInt(path.length)
   })
+
+console.log(items)
+
+const smallest = Math.min(...items)
+
+let j = 0
+while (true) {
+  j++
+  part2 = smallest * j
+  if (items.every(i => part2 % i === 0)) break
+}
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
