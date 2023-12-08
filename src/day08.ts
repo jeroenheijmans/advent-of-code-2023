@@ -77,7 +77,7 @@ Object.values(nodes)
     console.log()
   })
 
-const part2 = x
+const part2 = x + 6
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
