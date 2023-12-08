@@ -51,25 +51,26 @@ function pathLen(locations: ILocation[], endNodeProp: "isPart1EndNode"|"isPart2E
   let i = 0
   const len = nav.length
   do {
-    let isFinal = true
+    let nrOfEndNodes = 0
 
     locations.forEach((location, index) => {
       const turn = nav[i % len]
       // console.log("At", location, "turning", turn)
       const target = location[turn]
       locations[index] = map[target]
-      isFinal = isFinal && location[endNodeProp]
+      if (location[endNodeProp]) nrOfEndNodes++
     })
 
-    if (isFinal) return result
+    if (nrOfEndNodes > 0) console.log(i, nrOfEndNodes)
+    if (nrOfEndNodes === locations.length) return result
     result++
   } while (i++ < 1e9)
 }
 
 const path2Locations = Object.values(map).filter(n => n.isPart2StartNode)
 
-const part1 = pathLen([map["AAA"]], "isPart1EndNode")
-const part2 = path2Locations // pathLen(path2Locations, "isPart2EndNode")
+const part1 = map["AAA"] ? pathLen([map["AAA"]], "isPart1EndNode") : undefined
+const part2 = pathLen(path2Locations, "isPart2EndNode")
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
