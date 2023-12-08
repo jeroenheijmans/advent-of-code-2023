@@ -2,11 +2,16 @@ import {start, finish} from './util.ts'
 start(8)
 
 let input = `
-LLR
+LR
 
-AAA = (BBB, BBB)
-BBB = (AAA, ZZZ)
-ZZZ = (ZZZ, ZZZ)
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)
 `
 
 input = Deno.readTextFileSync("./src/inputs/day08.txt")
@@ -32,26 +37,32 @@ const map = data[1]
   }, {} as any)
 
 
-function pathLen(location = "AAA", endNodeProp = "isPart1EndNode") {
+function pathLen(locations: any[], endNodeProp = "isPart1EndNode") {
   let result = 0
   let i = 0
-  let len = nav.length
+  const len = nav.length
   do {
-    const turn = nav[i % len]
-    location = map[location][turn]
+    let isFinal = true
+
+    locations.forEach((location, index) => {
+      const turn = nav[i % len]
+      // console.log("At", location, "turning", turn)
+      const target = location[turn]
+      locations[index] = map[target]
+      isFinal = isFinal && location[endNodeProp]
+    })
+
+    if (isFinal) return result
     result++
-    if (map[location][endNodeProp]) return result
   } while (i++ < 1e9)
 }
 
-const part2Journeys = Object.values(map)
-  .filter(n => n.isPart2StartNode)
-  .map(n => pathLen(n.from, "isPart2EndNode"))
+const path2Locations = Object.values(map).filter(n => n.isPart2StartNode)
 
-const part1 = pathLen();
-const part2 = Math.max(...part2Journeys)
+// const part1 = pathLen(map["AAA"]);
+const part2 = pathLen(path2Locations, "isPart2EndNode") // Math.max(...part2Journeys)
 
-console.log("Part 1:", part1)
+// console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
 finish()
