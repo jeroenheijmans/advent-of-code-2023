@@ -54,43 +54,33 @@ while (current && !current.isPart1EndNode) {
   current = nodes[current[turn]] as ILocation
 }
 
-let part2 = 1
-let items: number[] = []
-
-Object.values(nodes)
+const items = Object.values(nodes)
   .filter(node => node.isPart2StartNode)
-  .forEach(node => {
-    const path: string[] = []
-
+  .map(node => {
     let current = node
-    let i = 0, step = 0, seen = 0
+    let i = 0, step = 0
     while (true) {
-      if (current.isPart2EndNode) console.log(i, " ====> ", current.key, `(step = ${step})`)
-      if (current.isPart2EndNode) seen++
-      const tuple = `${i};${current.key}`
-      // if (path.includes(tuple)) console.log("Finding repetition at", tuple)
-      // if (path.includes(tuple)) break
-      if (seen > 0) break
-      path.push(tuple)
+      // if (current.isPart2EndNode) console.log("Encountered end", current.key, ` at step = ${step}`)
+      if (current.isPart2EndNode) break
       const turn = nav[i++]
       i %= nav.length
       current = nodes[current[turn]]
       step++
     }
-    items.push(step)
-    console.log(path.length, ">>>", (path.length - i) / nav.length)
-    console.log()
+    return step
   })
 
-console.log(items)
+// console.log("Lengths:", items.toSorted())
 
-const smallest = Math.min(...items)
+const [item1, ...rest] = items.toSorted().toReversed()
 
-let j = 0
+console.log("Warning: unoptimized calculation might take dozens of seconds.")
+
+let part2 = 1
+let j = 1
 while (true) {
-  j++
-  part2 = smallest * j
-  if (items.every(i => part2 % i === 0)) break
+  part2 = item1 * j++
+  if (rest.every(i => part2 % i === 0)) break
 }
 
 console.log("Part 1:", part1)
