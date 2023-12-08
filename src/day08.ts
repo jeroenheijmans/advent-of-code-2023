@@ -54,6 +54,27 @@ while (current && !current.isPart1EndNode) {
   current = nodes[current[turn]] as ILocation
 }
 
+Object.values(nodes)
+  .filter(node => node.isPart2StartNode)
+  .forEach(node => {
+    const path: any[] = []
+
+    let current = node
+    let i = 0
+    while (true) {
+      if (current.isPart2EndNode) console.log(i, " ====> ", current.key)
+      const tuple = `${i};${current.key}`
+      if (path.includes(tuple)) console.log("Finding repetition at", tuple)
+      if (path.includes(tuple)) break
+      path.push(tuple)
+      const turn = nav[i++]
+      i %= nav.length
+      current = nodes[current[turn]]
+    }
+    console.log(path.length)
+    console.log()
+  })
+
 const part2 = 0
 
 console.log("Part 1:", part1)
