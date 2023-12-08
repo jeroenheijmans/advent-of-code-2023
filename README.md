@@ -25,7 +25,7 @@ Here's what I learned (or noticed) each day.
 5. Paint is a great coding support tool.
 6. Turns out mathematics *can* be useful.
 7. Jokers are wild!
-8. TODO
+8. Coding requires being unusually frustration-resistant.
 9. TODO
 10. TODO
 11. TODO
