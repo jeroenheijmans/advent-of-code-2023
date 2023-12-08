@@ -4,6 +4,8 @@ start(0)
 let input = `
 `
 
+// input = Deno.readTextFileSync("./src/inputs/day00.txt")
+
 const data = input
   .trim()
   .split(/\r?\n/)
