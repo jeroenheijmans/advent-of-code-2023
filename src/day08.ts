@@ -45,7 +45,6 @@ const map = data[1]
     return result
   }, {} as Record<string, ILocation>)
 
-
 function pathLen(locations: ILocation[], endNodeProp: "isPart1EndNode"|"isPart2EndNode") {
   let result = 0
   let i = 0
@@ -61,10 +60,11 @@ function pathLen(locations: ILocation[], endNodeProp: "isPart1EndNode"|"isPart2E
       if (location[endNodeProp]) nrOfEndNodes++
     })
 
-    if (nrOfEndNodes > 0) console.log(i, nrOfEndNodes)
+    // if (nrOfEndNodes > 0) console.log(i, nrOfEndNodes)
+    if (i % 1e8 === 0) console.log(i, new Date().toLocaleTimeString())
     if (nrOfEndNodes === locations.length) return result
     result++
-  } while (i++ < 1e9)
+  } while (i++ < 1e11)
 }
 
 const path2Locations = Object.values(map).filter(n => n.isPart2StartNode)
