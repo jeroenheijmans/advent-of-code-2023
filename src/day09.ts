@@ -26,19 +26,43 @@ function buildPyramid(line: number[]): number[][] {
   return [line, ...buildPyramid(nextLine)]
 }
 
+// lines.forEach(line => {
+//   const pyramid = buildPyramid(line)
+//   for (let i = 0; i < pyramid.length; i++) {
+//     const index = pyramid.length - i - 1;
+//     if (i === 0) {
+//       pyramid[index].push(0)
+//     } else {
+//       const left = pyramid[index + 1].at(-1) || 0;
+//       const right = pyramid[index + 1].at(-2) || 0;
+//       const base = pyramid[index].at(-1) || 0;
+//       const extra = base + Math.abs(left - right)
+//       pyramid[index].push(extra)
+//       part1 += extra
+//     }
+
+//     // console.log(" ".repeat(index * 3) + pyramid[index]
+//     //   .map(n => n.toString().padStart(6, " "))
+//     //   .join(" ")
+//     // )
+//   }
+//   // console.log("--------------------------------------------------")
+//   // console.log()
+// })
+
+let part2 = 0
+
 lines.forEach(line => {
   const pyramid = buildPyramid(line)
   for (let i = 0; i < pyramid.length; i++) {
     const index = pyramid.length - i - 1;
     if (i === 0) {
-      pyramid[index].push(0)
+      pyramid[index].unshift(0)
     } else {
-      const left = pyramid[index + 1].at(-1) || 0;
-      const right = pyramid[index + 1].at(-2) || 0;
-      const base = pyramid[index].at(-1) || 0;
-      const extra = base + Math.abs(left - right)
-      pyramid[index].push(extra)
-      part1 += extra
+      const above = pyramid[index + 1].at(0) || 0
+      const base = pyramid[index].at(0) || 0
+      const extra = base - above
+      pyramid[index].unshift(extra)
     }
 
     // console.log(" ".repeat(index * 3) + pyramid[index]
@@ -46,11 +70,11 @@ lines.forEach(line => {
     //   .join(" ")
     // )
   }
+
+  part2 += pyramid[0][0]
   // console.log("--------------------------------------------------")
   // console.log()
 })
-
-const part2 = 0
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
