@@ -41,13 +41,13 @@ lines.forEach(line => {
       part1 += extra
     }
 
-    console.log(" ".repeat(index * 3) + pyramid[index]
-      .map(n => n.toString().padStart(6, " "))
-      .join(" ")
-    )
+    // console.log(" ".repeat(index * 3) + pyramid[index]
+    //   .map(n => n.toString().padStart(6, " "))
+    //   .join(" ")
+    // )
   }
-  console.log("--------------------------------------------------")
-  console.log()
+  // console.log("--------------------------------------------------")
+  // console.log()
 })
 
 const part2 = 0
