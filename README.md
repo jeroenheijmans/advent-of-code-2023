@@ -26,7 +26,7 @@ Here's what I learned (or noticed) each day.
 6. Turns out mathematics *can* be useful.
 7. Jokers are wild!
 8. Coding requires being unusually frustration-resistant.
-9. TODO
+9. Coding for speed is something else.
 10. TODO
 11. TODO
 12. TODO
