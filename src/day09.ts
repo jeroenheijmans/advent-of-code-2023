@@ -21,7 +21,7 @@ function buildPyramid(line: number[]): number[][] {
   if (line.every(n => n === 0)) return [line]
   const nextLine = []
   for (let i = 1; i < line.length; i++) {
-    nextLine.push(Math.abs(line[i] - line[i - 1]))
+    nextLine.push(line[i] - line[i - 1])
   }
   return [line, ...buildPyramid(nextLine)]
 }
@@ -40,8 +40,14 @@ lines.forEach(line => {
       pyramid[index].push(extra)
       part1 += extra
     }
+
+    console.log(" ".repeat(index * 3) + pyramid[index]
+      .map(n => n.toString().padStart(6, " "))
+      .join(" ")
+    )
   }
-  // pyramid.forEach(x => console.log(x.map(n => n.toString().padStart(6, " ")).join(" "))) 
+  console.log("--------------------------------------------------")
+  console.log()
 })
 
 const part2 = 0
