@@ -1,5 +1,5 @@
-import {start, finish, multiply} from './util.ts'
-start(6)
+import {root, finish, multiply} from './util.ts'
+root(6)
 
 let input = `
 Time:      7  15   30

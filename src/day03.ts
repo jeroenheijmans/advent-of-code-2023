@@ -1,5 +1,5 @@
-import {start, finish, add} from './util.ts';
-start(3);
+import {root, finish, add} from './util.ts';
+root(3);
 
 let input = `
 467..114..

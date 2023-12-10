@@ -1,5 +1,5 @@
-import {start, finish} from './util.ts'
-start(0)
+import {root, finish} from './util.ts'
+root(0)
 
 let input = `
 `

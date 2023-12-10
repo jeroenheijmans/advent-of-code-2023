@@ -1,5 +1,5 @@
-import {start, finish} from './util.ts'
-start(9)
+import {root, finish} from './util.ts'
+root(9)
 
 let input = `
 0 3 6 9 12 15

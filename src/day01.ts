@@ -1,5 +1,5 @@
-import {start, finish, add} from './util.ts';
-start(1);
+import {root, finish, add} from './util.ts';
+root(1);
 
 let input = `
 1abc2

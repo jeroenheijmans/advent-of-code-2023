@@ -1,5 +1,5 @@
-import {start, finish, add} from './util.ts'
-start(7)
+import {root, finish, add} from './util.ts'
+root(7)
 
 let input = `
 32T3K 765

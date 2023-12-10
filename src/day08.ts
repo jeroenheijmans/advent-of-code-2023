@@ -1,5 +1,5 @@
-import {start, finish} from './util.ts'
-start(8)
+import {root, finish} from './util.ts'
+root(8)
 
 let input = `
 LR

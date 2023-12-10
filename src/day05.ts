@@ -1,5 +1,5 @@
-import {start, finish} from './util.ts'
-start(5)
+import {root, finish} from './util.ts'
+root(5)
 
 let input = `
 seeds: 79 14

@@ -1,7 +1,7 @@
-import {start, finish} from '../util.ts';
+import {root, finish} from '../util.ts';
 import { wetzls } from './smallest-enclosing-circle.ts';
 
-start();
+root();
 
 const input = `(44, -28), (-71, -92), (89, 60), (95, 79)
 (50, -15), (3, -83), (-88, -56), (56, 86), (-1, 36), (-19, 73)
