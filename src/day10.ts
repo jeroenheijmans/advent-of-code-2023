@@ -1,5 +1,5 @@
-import {start, finish} from './util.ts'
-start(10)
+import {startDay, finishDay} from './util.ts'
+startDay(10)
 
 let input = `
 ...........
@@ -205,4 +205,4 @@ const part2 = filled.length
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
-finish()
+finishDay()

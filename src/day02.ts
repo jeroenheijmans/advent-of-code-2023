@@ -1,5 +1,5 @@
-import {root, finish, add} from './util.ts';
-root(2);
+import {startDay, finishDay, add} from './util.ts';
+startDay(2);
 
 let input = `
 Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
@@ -45,4 +45,4 @@ const part2 = data
 console.log("Part 1:", part1);
 console.log("Part 2:", part2);
 
-finish();
+finishDay();

@@ -1,5 +1,5 @@
-import {root, finish, add} from './util.ts';
-root(4);
+import {startDay, finishDay, add} from './util.ts';
+startDay(4);
 
 let input = `
 Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
@@ -47,4 +47,4 @@ const part2 = Object.values(nrOfCopies).reduce(add, 0);
 console.log("Part 1:", part1);
 console.log("Part 2:", part2);
 
-finish();
+finishDay();

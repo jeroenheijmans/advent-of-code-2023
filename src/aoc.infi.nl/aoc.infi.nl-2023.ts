@@ -1,7 +1,7 @@
-import {root, finish} from '../util.ts';
+import {startDay, finishDay} from '../util.ts';
 import { wetzls } from './smallest-enclosing-circle.ts';
 
-root();
+startDay();
 
 const input = `(44, -28), (-71, -92), (89, 60), (95, 79)
 (50, -15), (3, -83), (-88, -56), (56, 86), (-1, 36), (-19, 73)
@@ -56,4 +56,4 @@ const part2 = data
 console.log("Part 1:", Math.trunc(part1));
 console.log("Part 2:", Math.trunc(part2));
 
-finish();
+finishDay();

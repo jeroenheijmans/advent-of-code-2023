@@ -1,5 +1,5 @@
-import {root, finish, multiply} from './util.ts'
-root(6)
+import {startDay, finishDay, multiply} from './util.ts'
+startDay(6)
 
 let input = `
 Time:      7  15   30
@@ -62,4 +62,4 @@ for (let t = 0; t < time; t++) {
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
-finish()
+finishDay()

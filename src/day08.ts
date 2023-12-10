@@ -1,5 +1,5 @@
-import {root, finish} from './util.ts'
-root(8)
+import {startDay, finishDay} from './util.ts'
+startDay(8)
 
 let input = `
 LR
@@ -86,4 +86,4 @@ while (true) {
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
-finish()
+finishDay()

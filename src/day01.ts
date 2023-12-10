@@ -1,5 +1,5 @@
-import {root, finish, add} from './util.ts';
-root(1);
+import {startDay, finishDay, add} from './util.ts';
+startDay(1);
 
 let input = `
 1abc2
@@ -66,4 +66,4 @@ const part2 = data
 console.log("Part 1:", part1);
 console.log("Part 2:", part2);
 
-finish();
+finishDay();

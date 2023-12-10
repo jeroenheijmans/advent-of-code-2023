@@ -1,5 +1,5 @@
-import {root, finish} from './util.ts'
-root(5)
+import {startDay, finishDay} from './util.ts'
+startDay(5)
 
 let input = `
 seeds: 79 14
@@ -183,4 +183,4 @@ const part2 = Math.min(...slices.map(s => s.from))
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
-finish()
+finishDay()

@@ -1,5 +1,5 @@
-import {root, finish, add} from './util.ts'
-root(7)
+import {startDay, finishDay, add} from './util.ts'
+startDay(7)
 
 let input = `
 32T3K 765
@@ -106,4 +106,4 @@ const part2 = data
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
-finish()
+finishDay()

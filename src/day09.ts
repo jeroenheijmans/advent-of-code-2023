@@ -1,5 +1,5 @@
-import {root, finish} from './util.ts'
-root(9)
+import {startDay, finishDay} from './util.ts'
+startDay(9)
 
 let input = `
 0 3 6 9 12 15
@@ -64,4 +64,4 @@ pyramids.forEach(pyramid => {
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
-finish()
+finishDay()

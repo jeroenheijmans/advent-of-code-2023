@@ -1,13 +1,13 @@
 let timeout: number;
 let startedAt: Date;
 
-export function start(day: number, maxRunTime = 5000) {
+export function startDay(day: number, maxRunTime = 5000) {
   startedAt = new Date();
   console.log(`%cAdvent of Code DAY ${day.toString().padStart(2, "0")}, running at ${startedAt.toLocaleTimeString()}, ${startedAt.toLocaleDateString()}`, 'color: lime');
   timeout = setTimeout(() => { throw Error(`Script timed out after ${maxRunTime}ms!`); }, maxRunTime);
 }
 
-export function finish() {
+export function finishDay() {
   const finishedIn = new Date().getTime() - startedAt.getTime();
   console.log(`%cFinished in ${finishedIn}ms.`, 'color: gray');
   console.log("");

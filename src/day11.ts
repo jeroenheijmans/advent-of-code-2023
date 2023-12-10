@@ -1,5 +1,5 @@
 import {startDay, finishDay} from './util.ts'
-startDay(0)
+startDay(11)
 
 let input = `
 `
