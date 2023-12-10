@@ -12,14 +12,6 @@ let input = `
 .L--J.L--J.
 ...........
 `
-
-// input = `
-// .....
-// .S-7.
-// .|.|.
-// .L-J.
-// .....`
-
 input = Deno.readTextFileSync("./src/inputs/day10.txt")
 
 const data = input
@@ -56,13 +48,7 @@ let root: Pipe = new Pipe(-1, -1, "X");
 
 const lookup: Record<string, Pipe> = {};
 
-const extendedData = data /*[
-  ".".repeat(data[0].length + 2),
-  ...data.map(line => "." + line + "."),
-  ".".repeat(data[0].length + 2),
-]*/
-
-const items: Pipe[] = extendedData
+const items: Pipe[] = data
   .map((line, y) => line.split("")
     .map((letter, x) => new Pipe(x, y, letter))
   )
@@ -160,20 +146,10 @@ Object.keys(lookup).forEach(key => {
   }
 })
 
-// const loopItems = items.filter(i => keysPartOfMainLoop.has(i.key))
 const maxx = Math.max(...items.map(p => p.x))
 const maxy = Math.max(...items.map(p => p.y))
 
-// for (let y = 0; y <= maxy; y++) {
-//   let line = ""
-//   for (let x = 0; x <= maxx; x++) {
-//     const key = `${x};${y}`
-//     line += keysPartOfMainLoop.has(key) ? lookup[key].shapeBlock : "·"
-//   }
-//   console.log(line)
-// }
-
-const beginning = lookup[`${root.x};${root.y+1}`] // guesss starting point for flood fill:
+const beginning = lookup[`${root.x};${root.y+1}`] // guesss starting point for flood fill, which is pretty bad but oh well
 const flooded = new Set([beginning.key])
 let currentEdges = new Set([beginning])
 
@@ -183,7 +159,6 @@ while (currentEdges.size > 0) {
   currentEdges.forEach(e => {
     e.connectedCorners.forEach(other => {
       if (flooded.has(other.key)) return;
-      // console.log('Considering', other.key)
       newEdges.add(other)
       flooded.add(other.key)
     })
@@ -201,20 +176,17 @@ const filled = items
     flooded.has(`${i.x+1};${i.y+1}`)
   )
 
-
-const boxes = filled.map(p => p.key)
-// console.log(boxes)
-// console.log(flooded)
-
-for (let y = 0; y <= maxy; y++) {
-  let line = ""
-  for (let x = 0; x <= maxx; x++) {
-    const key = `${x};${y}`
-    if (boxes.includes(key)) { line += '░'; continue; }
-    line += keysPartOfMainLoop.has(key) ? lookup[key].shapeBlock : ' '
-  }
-  console.log(line)
-}
+// Visualize part 2:
+// const boxes = filled.map(p => p.key)
+// for (let y = 0; y <= maxy; y++) {
+//   let line = ""
+//   for (let x = 0; x <= maxx; x++) {
+//     const key = `${x};${y}`
+//     if (boxes.includes(key)) { line += '░'; continue; }
+//     line += keysPartOfMainLoop.has(key) ? lookup[key].shapeBlock : ' '
+//   }
+//   console.log(line)
+// }
 
 const part2 = filled.length
 
