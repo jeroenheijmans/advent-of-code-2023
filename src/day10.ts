@@ -2,14 +2,14 @@ import {start, finish} from './util.ts'
 start(10)
 
 let input = `
-.....
-.S-7.
-.|.|.
-.L-J.
-.....
+..F7.
+.FJ|.
+SJ.L7
+|F--J
+LJ...
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day10.txt")
+input = Deno.readTextFileSync("./src/inputs/day10.txt")
 
 const data = input
   .trim()
@@ -21,6 +21,10 @@ class Pipe {
   connected: Pipe[] = []
   constructor(public x: number, public y: number, public shape: string) {
     this.key = `${x};${y}`
+  }
+
+  getConnectedDebugInfo() {
+    return this.connected.map(b => `${b.shape} (${b.key})`)
   }
 }
 
@@ -74,15 +78,17 @@ items.forEach(i => {
 })
 
 function findPathLengthToStart(current: Pipe): number {
-  const visited: Pipe[] = [current]
+  const visited: string[] = [current.key]
   current = current.connected.find(p => p !== root) as Pipe
+  visited.push(current.key)
   let i = 0
-  while (current !== root && i++ < 10) {
-    current = current.connected.find(p => p.key !== visited.at(-1)?.key) as Pipe
-    visited.push(current)
+  while (current !== root) {
+    current = current.connected.find(p => !visited.includes(p.key)) as Pipe
+    visited.push(current.key)
   }
-  console.log(visited.map(x => x.key + " " + x.shape))
-  return visited.length - 1
+  // console.log(visited.map(key => `${key} ${lookup[key].shape}`).join ("\n"))
+  // console.log()
+  return visited.length
 }
 
 const part1 = [
@@ -93,6 +99,7 @@ const part1 = [
   ]
   .filter(x => x)
   .map(x => findPathLengthToStart(x))
+  [0] / 2
 
 const part2 = 0
 
