@@ -2,14 +2,18 @@ import {start, finish} from './util.ts'
 start(10)
 
 let input = `
-..F7.
-.FJ|.
-SJ.L7
-|F--J
-LJ...
+...........
+.S-------7.
+.|F-----7|.
+.||.....||.
+.||.....||.
+.|L-7.F-J|.
+.|..|.|..|.
+.L--J.L--J.
+...........
 `
 
-input = Deno.readTextFileSync("./src/inputs/day10.txt")
+// input = Deno.readTextFileSync("./src/inputs/day10.txt")
 
 const data = input
   .trim()
@@ -18,9 +22,17 @@ const data = input
 
 class Pipe {
   key = ""
+  shapeBlock = " "
   connected: Pipe[] = []
   constructor(public x: number, public y: number, public shape: string) {
     this.key = `${x};${y}`
+    if (shape === "|") this.shapeBlock = "│"
+    if (shape === "-") this.shapeBlock = "─"
+    if (shape === "J") this.shapeBlock = "┘"
+    if (shape === "7") this.shapeBlock = "┐"
+    if (shape === "F") this.shapeBlock = "┌"
+    if (shape === "L") this.shapeBlock = "└"
+    if (shape === "S") this.shapeBlock = "┼"
   }
 
   getConnectedDebugInfo() {
@@ -77,17 +89,21 @@ items.forEach(i => {
   }
 })
 
+const keysPartOfMainLoop = new Set([root.key])
+
 function findPathLengthToStart(current: Pipe): number {
   const visited: string[] = [current.key]
+  keysPartOfMainLoop.add(current.key)
+
   current = current.connected.find(p => p !== root) as Pipe
   visited.push(current.key)
-  let i = 0
+  keysPartOfMainLoop.add(current.key)
+
   while (current !== root) {
     current = current.connected.find(p => !visited.includes(p.key)) as Pipe
     visited.push(current.key)
+    keysPartOfMainLoop.add(current.key)
   }
-  // console.log(visited.map(key => `${key} ${lookup[key].shape}`).join ("\n"))
-  // console.log()
   return visited.length
 }
 
@@ -100,6 +116,23 @@ const part1 = [
   .filter(x => x)
   .map(x => findPathLengthToStart(x))
   [0] / 2
+
+Object.keys(lookup).forEach(key => {
+  if (!keysPartOfMainLoop.has(key)) delete lookup[key]
+})
+
+const loopItems = items.filter(i => keysPartOfMainLoop.has(i.key))
+const maxx = Math.max(...loopItems.map(p => p.x))
+const maxy = Math.max(...loopItems.map(p => p.y))
+
+for (let y = -1; y <= maxy + 1; y++) {
+  let line = ""
+  for (let x = -1; x <= maxx + 1; x++) {
+    const key = `${x};${y}`
+    line += keysPartOfMainLoop.has(key) ? lookup[key].shapeBlock : ' '
+  }
+  console.log(line)
+}
 
 const part2 = 0
 
