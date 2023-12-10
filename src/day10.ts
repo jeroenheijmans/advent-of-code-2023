@@ -13,7 +13,14 @@ let input = `
 ...........
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day10.txt")
+// input = `
+// .....
+// .S-7.
+// .|.|.
+// .L-J.
+// .....`
+
+input = Deno.readTextFileSync("./src/inputs/day10.txt")
 
 const data = input
   .trim()
@@ -24,15 +31,20 @@ class Pipe {
   key = ""
   shapeBlock = " "
   connected: Pipe[] = []
+  connectedCorners: Pipe[] = []
+  allowVerticalPass = false
+  allowHorizontalPass = false
+  
   constructor(public x: number, public y: number, public shape: string) {
     this.key = `${x};${y}`
-    if (shape === "|") this.shapeBlock = "│"
-    if (shape === "-") this.shapeBlock = "─"
-    if (shape === "J") this.shapeBlock = "┘"
-    if (shape === "7") this.shapeBlock = "┐"
-    if (shape === "F") this.shapeBlock = "┌"
-    if (shape === "L") this.shapeBlock = "└"
-    if (shape === "S") this.shapeBlock = "┼"
+    if (shape === "|") { this.shapeBlock = "│"; this.allowVerticalPass = true; }
+    if (shape === "-") { this.shapeBlock = "─"; this.allowHorizontalPass = true; }
+    if (shape === "J") { this.shapeBlock = "┘"; }
+    if (shape === "7") { this.shapeBlock = "┐"; this.allowHorizontalPass = true; }
+    if (shape === "F") { this.shapeBlock = "┌"; this.allowHorizontalPass = this.allowVerticalPass = true; }
+    if (shape === "L") { this.shapeBlock = "└"; this.allowVerticalPass = true; }
+    if (shape === "S") { this.shapeBlock = "┼"; }
+    if (shape === ".") { this.shapeBlock = "·"; this.allowHorizontalPass = this.allowVerticalPass = true; }
   }
 
   getConnectedDebugInfo() {
@@ -44,12 +56,17 @@ let root: Pipe = new Pipe(-1, -1, "X");
 
 const lookup: Record<string, Pipe> = {};
 
-const items: Pipe[] = data
+const extendedData = data /*[
+  ".".repeat(data[0].length + 2),
+  ...data.map(line => "." + line + "."),
+  ".".repeat(data[0].length + 2),
+]*/
+
+const items: Pipe[] = extendedData
   .map((line, y) => line.split("")
     .map((letter, x) => new Pipe(x, y, letter))
   )
   .flat()
-  .filter(p => p.shape !== ".")
 
 items.forEach(i => { lookup[i.key] = i; });
 
@@ -113,28 +130,93 @@ const part1 = [
     lookup[`${root.x - 1};${root.y + 0}`],
     lookup[`${root.x + 1};${root.y + 0}`],
   ]
-  .filter(x => x)
+  .filter(x => x.shape !== ".")
   .map(x => findPathLengthToStart(x))
   [0] / 2
 
 Object.keys(lookup).forEach(key => {
-  if (!keysPartOfMainLoop.has(key)) delete lookup[key]
+  const pipe = lookup[key]
+
+  if (!keysPartOfMainLoop.has(key)) {
+    lookup[key].shape = "."
+    pipe.allowHorizontalPass = true
+    pipe.allowVerticalPass = true
+  }
+
+  if (pipe.allowHorizontalPass) {
+    const other = lookup[`${pipe.x + 1};${pipe.y}`]
+    if (other) {
+      pipe.connectedCorners.push(other)
+      other.connectedCorners.push(pipe)
+    }
+  }
+
+  if (pipe.allowVerticalPass) {
+    const other = lookup[`${pipe.x};${pipe.y+1}`]
+    if (other) {
+      pipe.connectedCorners.push(other)
+      other.connectedCorners.push(pipe)
+    }
+  }
 })
 
-const loopItems = items.filter(i => keysPartOfMainLoop.has(i.key))
-const maxx = Math.max(...loopItems.map(p => p.x))
-const maxy = Math.max(...loopItems.map(p => p.y))
+// const loopItems = items.filter(i => keysPartOfMainLoop.has(i.key))
+const maxx = Math.max(...items.map(p => p.x))
+const maxy = Math.max(...items.map(p => p.y))
 
-for (let y = -1; y <= maxy + 1; y++) {
+// for (let y = 0; y <= maxy; y++) {
+//   let line = ""
+//   for (let x = 0; x <= maxx; x++) {
+//     const key = `${x};${y}`
+//     line += keysPartOfMainLoop.has(key) ? lookup[key].shapeBlock : "·"
+//   }
+//   console.log(line)
+// }
+
+const beginning = lookup[`${root.x};${root.y+1}`] // guesss starting point for flood fill:
+const flooded = new Set([beginning.key])
+let currentEdges = new Set([beginning])
+
+while (currentEdges.size > 0) {
+  const newEdges = new Set<Pipe>()
+
+  currentEdges.forEach(e => {
+    e.connectedCorners.forEach(other => {
+      if (flooded.has(other.key)) return;
+      // console.log('Considering', other.key)
+      newEdges.add(other)
+      flooded.add(other.key)
+    })
+  })
+
+  currentEdges = newEdges
+}
+
+const filled = items
+  .filter(i => i.shape === ".")
+  .filter(i => 
+    flooded.has(`${i.x};${i.y}`) &&
+    flooded.has(`${i.x+1};${i.y}`) &&
+    flooded.has(`${i.x};${i.y+1}`) &&
+    flooded.has(`${i.x+1};${i.y+1}`)
+  )
+
+
+const boxes = filled.map(p => p.key)
+// console.log(boxes)
+// console.log(flooded)
+
+for (let y = 0; y <= maxy; y++) {
   let line = ""
-  for (let x = -1; x <= maxx + 1; x++) {
+  for (let x = 0; x <= maxx; x++) {
     const key = `${x};${y}`
+    if (boxes.includes(key)) { line += '░'; continue; }
     line += keysPartOfMainLoop.has(key) ? lookup[key].shapeBlock : ' '
   }
   console.log(line)
 }
 
-const part2 = 0
+const part2 = filled.length
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
