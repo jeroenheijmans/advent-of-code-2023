@@ -149,23 +149,35 @@ Object.keys(lookup).forEach(key => {
 const maxx = Math.max(...items.map(p => p.x))
 const maxy = Math.max(...items.map(p => p.y))
 
-const beginning = lookup[`${root.x};${root.y+1}`] // guesss starting point for flood fill, which is pretty bad but oh well
-const flooded = new Set([beginning.key])
-let currentEdges = new Set([beginning])
+function findFloodedAreaFrom(beginning: Pipe) {
+  const flooded = new Set([beginning.key])
+  let currentEdges = new Set([beginning])
 
-while (currentEdges.size > 0) {
-  const newEdges = new Set<Pipe>()
+  while (currentEdges.size > 0) {
+    const newEdges = new Set<Pipe>()
 
-  currentEdges.forEach(e => {
-    e.connectedCorners.forEach(other => {
-      if (flooded.has(other.key)) return;
-      newEdges.add(other)
-      flooded.add(other.key)
+    currentEdges.forEach(e => {
+      e.connectedCorners.forEach(other => {
+        if (flooded.has(other.key)) return;
+        newEdges.add(other)
+        flooded.add(other.key)
+      })
     })
-  })
 
-  currentEdges = newEdges
+    currentEdges = newEdges
+  }
+  return flooded
 }
+
+const floodedOptions = [
+  findFloodedAreaFrom(lookup[`${root.x};${root.y}`]),
+  findFloodedAreaFrom(lookup[`${root.x};${root.y+1}`]),
+  findFloodedAreaFrom(lookup[`${root.x+1};${root.y}`]),
+  findFloodedAreaFrom(lookup[`${root.x+1};${root.y+1}`]),
+]
+
+console.log("Warning: Taking an educated guess for part 2");
+const flooded = floodedOptions.toSorted()[1] // TODO: Generalize solution
 
 const filled = items
   .filter(i => i.shape === ".")
