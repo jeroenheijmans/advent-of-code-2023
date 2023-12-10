@@ -27,7 +27,7 @@ Here's what I learned (or noticed) each day.
 7. Jokers are wild!
 8. Coding requires being unusually frustration-resistant.
 9. Coding for speed is something else.
-10. TODO
+10. Lack of sleep lowers effective IQ.
 11. TODO
 12. TODO
 13. TODO
