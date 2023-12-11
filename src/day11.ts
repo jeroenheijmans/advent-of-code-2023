@@ -21,28 +21,23 @@ const data = input
   .split(/\r?\n/)
   .filter(x => x)
 
-const galaxies: {n:number, x:number, y:number}[] = []
+const galaxies: {x:number, y:number}[] = []
 
 const emptyRowIndexes = new Set(Array.from({length: data.length}, (_, i) => i))
 const emptyColIndexes = new Set(Array.from({length: data[0].length}, (_, i) => i))
 
-let n = 0
- 
 for (let y=0; y<data.length; y++) {
   for (let x=0; x<data[0].length; x++) {
     if (data[y][x] === "#") {
-      n++
-      galaxies.push({n, x, y})
+      galaxies.push({x, y})
       emptyColIndexes.delete(x)
       emptyRowIndexes.delete(y)
     }
   }
 }
 
-// console.log("emptyColIndexes", emptyColIndexes)
-// console.log("emptyRowIndexes", emptyRowIndexes)
-
 let part1 = 0
+let part2 = 0
 
 for (let i=0; i<galaxies.length; i++) {
   for (let j=i+1; j<galaxies.length; j++) {
@@ -54,18 +49,19 @@ for (let i=0; i<galaxies.length; i++) {
     const emptyRowCount = [...emptyRowIndexes].filter(y => y < maxy && y > miny).length
     const emptyColCount = [...emptyColIndexes].filter(x => x < maxx && x > minx).length
 
-    const age = 1000000
+    const age = 2
     const dx = (maxx - minx) + (age - 1) * emptyColCount
     const dy = (maxy - miny) + (age - 1) * emptyRowCount
 
-    const dist = dx + dy
+    part1 += dx + dy
+    
+    const age2 = 1000000
+    const dx2 = (maxx - minx) + (age2 - 1) * emptyColCount
+    const dy2 = (maxy - miny) + (age2 - 1) * emptyRowCount
 
-    part1 += dist
-    // console.log("Delta", galaxies[i], galaxies[j], dist, emptyColCount, emptyRowCount)
+    part2 += dx2 + dy2
   }
 }
-
-const part2 = 0
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
