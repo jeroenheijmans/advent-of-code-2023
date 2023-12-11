@@ -28,7 +28,7 @@ Here's what I learned (or noticed) each day.
 8. Coding requires being unusually frustration-resistant.
 9. Coding for speed is something else.
 10. Lack of sleep lowers effective IQ.
-11. TODO
+11. Off by one: the second hardest thing in computer science.
 12. TODO
 13. TODO
 14. TODO
