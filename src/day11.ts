@@ -54,8 +54,9 @@ for (let i=0; i<galaxies.length; i++) {
     const emptyRowCount = [...emptyRowIndexes].filter(y => y < maxy && y > miny).length
     const emptyColCount = [...emptyColIndexes].filter(x => x < maxx && x > minx).length
 
-    const dx = (maxx - minx) + 1000000 * emptyColCount
-    const dy = (maxy - miny) + 1000000 * emptyRowCount
+    const age = 1000000
+    const dx = (maxx - minx) + (age - 1) * emptyColCount
+    const dy = (maxy - miny) + (age - 1) * emptyRowCount
 
     const dist = dx + dy
 
