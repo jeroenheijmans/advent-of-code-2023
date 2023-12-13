@@ -11,7 +11,7 @@ let input = `
 `
 
 // input = Deno.readTextFileSync("./src/inputs/day12.txt")
-input = '???.#?????????????? 1,8,4'
+// input = '???.#?????????????? 1,8,4'
 
 const data = input
   .trim()
@@ -49,7 +49,7 @@ function mightStillBePossible(line: string, largest: number) {
   }
   if (current > max) max = current
   // console.log(line, largest, max)
-  return largest >= max
+  return max >= largest
 }
 
 // console.log(isPossible("##..##.##".split(""), [3,2,2]))
