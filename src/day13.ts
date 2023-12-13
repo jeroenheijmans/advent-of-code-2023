@@ -79,7 +79,7 @@ const part2 = patterns
         const fixedPattern = JSON.parse(JSON.stringify(pattern)) as string[]
         fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
 
-        const result = getMirrorNumbers(fixedPattern).filter(n => part1Mirrors[idx].factor !== 1 || n !== part1Mirrors[idx].result)
+        const result = getMirrorNumbers(fixedPattern).filter(n => part1Mirrors[idx].factor !== 100 || n !== part1Mirrors[idx].result)
 
         if (result.length > 1) throw "Unexpectedly large list of mirrors: " + result.length
         if (result.length > 0) {
@@ -95,11 +95,11 @@ const part2 = patterns
         const fixedPattern = JSON.parse(JSON.stringify(transposedPattern)) as string[]
         fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
 
-        const result = getMirrorNumbers(fixedPattern).filter(n => part1Mirrors[idx].factor !== 100 || n !== part1Mirrors[idx].result)
+        const result = getMirrorNumbers(fixedPattern).filter(n => part1Mirrors[idx].factor !== 1 || n !== part1Mirrors[idx].result)
 
         if (result.length > 1) throw "Unexpectedly large list of mirrors: " + result.length
         if (result.length > 0) {
-          return result[0] * 100
+          return result[0] * 1
         }
       }
     }
