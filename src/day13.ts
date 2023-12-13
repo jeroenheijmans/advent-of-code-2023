@@ -26,7 +26,8 @@ const patterns = input
   .split(/\r?\n\r?\n/)
   .map(pattern => pattern.split(/\r?\n/))
 
-function getMirrorIndex(pattern: string[]) {
+function getMirrorNumbers(pattern: string[]) {
+  const results = []
   for (let i = 0; i < pattern.length - 1; i++) {
     let same = true
     for (let y1 = i, y2 = i + 1; y1 >= 0 && y2 < pattern.length; y1--, y2++) {
@@ -35,9 +36,9 @@ function getMirrorIndex(pattern: string[]) {
         break;
       }
     }
-    if (same) return i + 1
+    if (same) results.push(i + 1)
   }
-  return 0
+  return results
 }
 
 function transpose(pattern: string[]) {
@@ -49,14 +50,35 @@ function transpose(pattern: string[]) {
 
 const part1Mirrors = patterns
   .map(pattern => {
-    const normal = getMirrorIndex(pattern);
-    if (normal) return { result: normal, type: 'normal', factor: 100 }
-    return { result: getMirrorIndex(transpose(pattern)), type: 'transposed', factor: 1 }
+    const normal = getMirrorNumbers(pattern);
+    if (normal.length > 0) return { result: normal[0], type: 'normal', factor: 100 }
+    return { result: getMirrorNumbers(transpose(pattern))[0], type: 'transposed', factor: 1 }
   })
 
 const part1 = part1Mirrors
   .map(patternAnswer => patternAnswer.result * patternAnswer.factor)
   .reduce(add, 0)
+
+// const testje = `
+// ...##.#
+// .##.###
+// .##.###
+// ...##.#
+// #...###
+// .#..##.
+// ##.##.#
+// ...####
+// #.#.#.#
+// #....#.
+// ..#.##.
+// ..#.##.
+// #....#.
+// #.#.#.#
+// ...####
+// `.trim().split(/\r?\n/)
+
+// const result = getMirrorNumbers(testje)
+// console.log("Result testje", result)
 
 const part2 = patterns
   .map((pattern, idx) => {
@@ -65,10 +87,10 @@ const part2 = patterns
         const fixedPattern = JSON.parse(JSON.stringify(pattern)) as string[]
         fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
 
-        const result = getMirrorIndex(fixedPattern)
+        const result = getMirrorNumbers(fixedPattern).filter(n => part1Mirrors[idx].type !== "normal" || n !== part1Mirrors[idx].result)
 
-        if (result && result !== part1Mirrors[idx].result) {
-          return result * 100
+        if (result.length > 0) {
+          return result[0] * 100
         }
       }
     }
@@ -80,21 +102,20 @@ const part2 = patterns
         const fixedPattern = JSON.parse(JSON.stringify(transposedPattern)) as string[]
         fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
 
-        const result = getMirrorIndex(fixedPattern)
-        if (result && result !== part1Mirrors[idx].result) {
-          return result
+        const result = getMirrorNumbers(fixedPattern).filter(n => part1Mirrors[idx].type !== "transposed" || n !== part1Mirrors[idx].result)
+        if (result.length > 0) {
+          return result[0] * 100
         }
       }
     }
-    // console.log(idx)
-    // console.log()
-    // console.log(part1Mirrors[idx])
-    // console.log()
-    // transposedPattern.forEach(l => console.log(l))
-    // console.log()
-    // pattern.forEach(l => console.log(l))
-    // throw "Unexpectedly found no smudge that would fix things"
-    return 0
+
+    console.log("Pattern index:", idx)
+    console.log(part1Mirrors[idx])
+    console.log()
+    transposedPattern.forEach(l => console.log(l))
+    console.log()
+    pattern.forEach(l => console.log(l))
+    throw "Unexpectedly found no smudge that would fix things"
   })
   .reduce(add, 0)
 
