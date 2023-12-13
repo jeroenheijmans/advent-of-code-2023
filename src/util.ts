@@ -28,6 +28,11 @@ export async function checkTimeout() {
 export function add(a: number, b: number) {
   return a + b;
 }
+
 export function multiply(a: number, b: number) {
   return a * b;
+}
+
+export function naiveReverse(str: string) {
+  return str.split("").reverse().join("")
 }
