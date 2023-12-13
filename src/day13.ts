@@ -27,7 +27,7 @@ const patterns = input
   .map(pattern => pattern.split(/\r?\n/))
 
 function getMirrorIndex(pattern: string[]) {
-  for (let n = 1; n < pattern[0].length - 1; n++) {
+  for (let n = 1; n < pattern[0].length; n++) {
     const areAllLinesMirrored = pattern.every(line => {
       const left = naiveReverse(line.substring(0, n))
       const right = line.substring(n)
