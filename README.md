@@ -30,7 +30,7 @@ Here's what I learned (or noticed) each day.
 10. Lack of sleep lowers effective IQ.
 11. Off by one: the second hardest thing in computer science.
 12. TODO
-13. TODO
+13. There's probably no digital task where Excel cannot play a role.
 14. TODO
 15. TODO
 16. TODO
