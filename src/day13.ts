@@ -58,53 +58,45 @@ const part1 = part1Mirrors
   .map(patternAnswer => patternAnswer.result * patternAnswer.factor)
   .reduce(add, 0)
 
-const part2 = 0 // patterns
-//   .map((pattern, idx) => {
-//     for (let y = 0; y < pattern.length; y++) {
-//       for (let x = 0; x < pattern[0].length; x++) {
-//         const fixedPattern = JSON.parse(JSON.stringify(pattern)) as string[]
-//         fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
+const part2 = patterns
+  .map((pattern, idx) => {
+    for (let y = 0; y < pattern.length; y++) {
+      for (let x = 0; x < pattern[0].length; x++) {
+        const fixedPattern = JSON.parse(JSON.stringify(pattern)) as string[]
+        fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
 
-//         const normalResult = getMirrorIndex(fixedPattern)
+        const result = getMirrorIndex(fixedPattern)
 
-//         if (normalResult) {
-//           if (normalResult !== part1Mirrors[idx].result) {
-//             // console.log("Found! Normal", normalResult, "at", x, ",", y)
-//             // console.log(fixedPattern)
-//             return normalResult
-//           }
-//         }
-//       }
-//     }
+        if (result && result !== part1Mirrors[idx].result) {
+          return result * 100
+        }
+      }
+    }
 
-//     const transposedPattern = transpose(pattern)
+    const transposedPattern = transpose(pattern)
 
-//     for (let y = 0; y < transposedPattern.length; y++) {
-//       for (let x = 0; x < transposedPattern[0].length; x++) {
-//         const fixedPattern = JSON.parse(JSON.stringify(transposedPattern)) as string[]
-//         fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
+    for (let y = 0; y < transposedPattern.length; y++) {
+      for (let x = 0; x < transposedPattern[0].length; x++) {
+        const fixedPattern = JSON.parse(JSON.stringify(transposedPattern)) as string[]
+        fixedPattern[y] = fixedPattern[y].replaceAt(x, fixedPattern[y][x] === "#" ? "." : "#")
 
-//         const transposedResult = getMirrorIndex(fixedPattern)
-//         // console.log("Transposed result = ", transposedResult)
-//         if (transposedResult) {
-//           if (transposedResult !== part1Mirrors[idx].result) {
-//             // console.log("Found! Transposed", transposedResult, "at row", y, "column", x)
-//             // console.log(fixedPattern)
-//             return transposedResult * 100
-//           }
-//         }
-//       }
-//     }
-//     // console.log(idx)
-//     // console.log()
-//     // console.log(part1Mirrors[idx])
-//     // console.log()
-//     // transposedPattern.forEach(l => console.log(l))
-//     // console.log()
-//     // pattern.forEach(l => console.log(l))
-//     throw "Unexpectedly found no smudge that would fix things"
-//   })
-//   .reduce(add, 0)
+        const result = getMirrorIndex(fixedPattern)
+        if (result && result !== part1Mirrors[idx].result) {
+          return result
+        }
+      }
+    }
+    // console.log(idx)
+    // console.log()
+    // console.log(part1Mirrors[idx])
+    // console.log()
+    // transposedPattern.forEach(l => console.log(l))
+    // console.log()
+    // pattern.forEach(l => console.log(l))
+    // throw "Unexpectedly found no smudge that would fix things"
+    return 0
+  })
+  .reduce(add, 0)
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
