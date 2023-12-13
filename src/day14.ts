@@ -1,10 +1,10 @@
 import {startDay, finishDay} from './util.ts'
-startDay(0)
+startDay(14)
 
 let input = `
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day0.txt")
+// input = Deno.readTextFileSync("./src/inputs/day14.txt")
 
 const data = input
   .trim()
