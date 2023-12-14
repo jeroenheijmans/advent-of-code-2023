@@ -37,6 +37,10 @@ export function naiveReverse(str: string) {
   return str.split("").reverse().join("")
 }
 
+export function areArraysEqual<T>(left: T[], right: T[]) {
+  return left && right && left.length === right.length && left.every((val, i) => val === right[i])
+}
+
 declare global {
   interface String {
     replaceAt(index: number, replacement: string): string
