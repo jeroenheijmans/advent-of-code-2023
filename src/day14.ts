@@ -131,7 +131,6 @@ function part2() {
 
     const rockKeys = new Set(Object.keys(rocksLookup))
 
-    if (i % 100 === 0) console.log(i)
     if (i < maxi - 1000 && states.find(state => [...state].every(r => rockKeys.has(r)))) {
       console.log("WARNING: Compensating for unknown bug by guessing an offset of -4 (different for sample input though)")
       console.log("Your answer may be wrong and you need to change -4 to something in that area")
