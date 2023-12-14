@@ -88,12 +88,10 @@ function part2() {
   const maxi = 1000000000
   const maxy = data.length, maxx = data[0].length
   const states: Set<string>[] = []
-  let done = false
+  
   // printRocks(rocks, wallsLookup)
-  while (i++ <= maxi) {
-    const rockKeys = new Set(Object.keys(rocksLookup))
-    states.push(rockKeys)
 
+  while (i++ < maxi) {
     const tumbles = [
       { direction: "N", moveY: -1, moveX: +0, compareFn: (a: Point, b: Point) => a.y - b.y },
       { direction: "W", moveY: +0, moveX: -1, compareFn: (a: Point, b: Point) => a.x - b.x },
@@ -120,9 +118,9 @@ function part2() {
             hasMoved = true
             delete rocksLookup[rock.key]
             rock.key = targetKey
-            rocksLookup[targetKey] = rock
             rock.y = targetY
             rock.x = targetX
+            rocksLookup[targetKey] = rock
           }
         })
         // console.log("Answer would be after", tumble.direction, rocks.map(r => data.length - r.y).reduce(add, 0))
@@ -131,17 +129,14 @@ function part2() {
       }
     })
 
-    if (i > maxi) break;
+    const rockKeys = new Set(Object.keys(rocksLookup))
 
-    const rockKeys2 = new Set(Object.keys(rocksLookup))
-
-    // if (i % 100 === 0) console.log(i)
-    if (!done && states.find(state => [...state].every(r => rockKeys2.has(r)))) {
-      done = true
-      const skipped = Math.trunc((maxi - i) / 4) * 4
-      i += skipped // - 16
-      // console.log("Skipping", skipped, i)
+    if (i % 100 === 0) console.log(i)
+    if (i < maxi - 1000 && states.find(state => [...state].every(r => rockKeys.has(r)))) {
+      i += (maxi - i - 3)
     }
+    
+    states.push(rockKeys)
   }
 
   const part2 = rocks.map(r => data.length - r.y).reduce(add, 0)
