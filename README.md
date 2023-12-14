@@ -31,7 +31,7 @@ Here's what I learned (or noticed) each day.
 11. Off by one: the second hardest thing in computer science.
 12. TODO
 13. There's probably no digital task where Excel cannot play a role.
-14. TODO
+14. Buggy code can incidentally be just fine.
 15. TODO
 16. TODO
 17. TODO
