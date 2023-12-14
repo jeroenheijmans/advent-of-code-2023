@@ -37,7 +37,6 @@ function printRocks(rocks: Point[], wallsLookup: Record<string, Point>) {
   }
 }
 
-
 function part1() {
   const rocks: Point[] = []
   const walls: Point[] = []
@@ -123,9 +122,6 @@ function part2() {
             rocksLookup[targetKey] = rock
           }
         })
-        // console.log("Answer would be after", tumble.direction, rocks.map(r => data.length - r.y).reduce(add, 0))
-        // printRocks(rocks, wallsLookup)
-        // console.log()
       }
     })
 
