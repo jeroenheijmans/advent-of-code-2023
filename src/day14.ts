@@ -27,6 +27,17 @@ interface Point {
   y: number;
 }
 
+function printRocks(rocks: Point[], wallsLookup: Record<string, Point>) {
+  for (let y = 0; y < data.length; y++) {
+    let line = ""
+    for (let x = 0; x < data[0].length; x++) {
+      line += rocks.find(r => r.y === y && r.x === x) ? "O" : wallsLookup[`${x};${y}`] ? "#" : ".";
+    }
+    console.log(line)
+  }
+}
+
+
 function part1() {
   const rocks: Point[] = []
   const walls: Point[] = []
@@ -52,24 +63,92 @@ function part1() {
     })
   }
 
-  // for (let y = 0; y < data.length; y++) {
-  //   let line = ""
-  //   for (let x = 0; x < data[0].length; x++) {
-  //     line += rocks.find(r => r.y === y && r.x === x) ? "O" : ".";
-  //   }
-  //   console.log(line)
-  // }
-
   const part1 = rocks.map(r => data.length - r.y).reduce(add, 0)
   console.log("Part 1:", part1)
 }
 
 function part2() {
-  const part2 = 0
+  const rocks: Point[] = []
+  const walls: Point[] = []
+  const rocksLookup: Record<string, Point> = {}
+  const wallsLookup: Record<string, Point> = {}
+
+  for (let y = 0; y < data.length; y++) {
+    for (let x = 0; x < data[0].length; x++) {
+      const key = `${x};${y}`
+      const item = {key,x,y}
+      if (data[y][x] === "O") rocks.push(item)
+      if (data[y][x] === "O") rocksLookup[key] = item
+      if (data[y][x] === "#") walls.push(item)
+      if (data[y][x] === "#") wallsLookup[key] = item
+    }
+  }
+
+  let i = 0
+  const maxi = 1000000000
+  const maxy = data.length, maxx = data[0].length
+  const states: Set<string>[] = []
+  let done = false
+  // printRocks(rocks, wallsLookup)
+  while (i++ <= maxi) {
+    const rockKeys = new Set(Object.keys(rocksLookup))
+    states.push(rockKeys)
+
+    const tumbles = [
+      { direction: "N", moveY: -1, moveX: +0, compareFn: (a: Point, b: Point) => a.y - b.y },
+      { direction: "W", moveY: +0, moveX: -1, compareFn: (a: Point, b: Point) => a.x - b.x },
+      { direction: "S", moveY: +1, moveX: +0, compareFn: (a: Point, b: Point) => b.y - a.y },
+      { direction: "E", moveY: +0, moveX: +1, compareFn: (a: Point, b: Point) => b.x - a.x },
+    ]
+
+    tumbles.forEach(tumble => {
+      
+      let hasMoved = true
+      while (hasMoved) {
+        hasMoved = false
+        rocks.toSorted(tumble.compareFn).forEach(rock =>{
+          const targetX = rock.x + tumble.moveX
+          const targetY = rock.y + tumble.moveY
+          const targetKey = `${targetX};${targetY}`
+
+          if (
+            targetX >= 0 && targetY >= 0
+            && targetX < maxx && targetY < maxy
+            && !wallsLookup[targetKey]
+            && !rocksLookup[targetKey]
+          ) {
+            hasMoved = true
+            delete rocksLookup[rock.key]
+            rock.key = targetKey
+            rocksLookup[targetKey] = rock
+            rock.y = targetY
+            rock.x = targetX
+          }
+        })
+        // console.log("Answer would be after", tumble.direction, rocks.map(r => data.length - r.y).reduce(add, 0))
+        // printRocks(rocks, wallsLookup)
+        // console.log()
+      }
+    })
+
+    if (i > maxi) break;
+
+    const rockKeys2 = new Set(Object.keys(rocksLookup))
+
+    // if (i % 100 === 0) console.log(i)
+    if (!done && states.find(state => [...state].every(r => rockKeys2.has(r)))) {
+      done = true
+      const skipped = Math.trunc((maxi - i) / 4) * 4
+      i += skipped // - 16
+      // console.log("Skipping", skipped, i)
+    }
+  }
+
+  const part2 = rocks.map(r => data.length - r.y).reduce(add, 0)
   console.log("Part 2:", part2)
 }
 
-part1()
+// part1()
 part2()
 
 finishDay()
