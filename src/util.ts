@@ -40,7 +40,21 @@ export function naiveReverse(str: string) {
 declare global {
   interface String {
     replaceAt(index: number, replacement: string): string
+    trimCharacter(character: string): string
   }
+}
+
+// https://stackoverflow.com/a/55292366/419956 by @JasonLarke
+String.prototype.trimCharacter = function(character: string) {
+  let start = 0, end = this.length;
+
+  while(start < end && this[start] === character)
+      ++start;
+
+  while(end > start && this[end - 1] === character)
+      --end;
+
+  return (start > 0 || end < this.length) ? this.substring(start, end) : this as string;
 }
 
 String.prototype.replaceAt = function(index, replacement) {

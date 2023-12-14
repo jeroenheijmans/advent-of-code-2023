@@ -12,6 +12,7 @@ let input = `
 
 // input = Deno.readTextFileSync("./src/inputs/day12.txt")
 // input = '???.#?????????????? 1,8,4'
+// input = `???????????????? 1,3,1,1,1`
 
 const data = input
   .trim()
@@ -32,7 +33,7 @@ function getIndexesOf(str: string, char: string) {
 }
 
 function isPossible(line: string, nrs: number[]) {
-  if (line.includes("?")) throw "Uncompleted line"
+  // if (line.includes("?")) throw "Uncompleted line"
   const sizes = line.split(/\.+/g).map(x => x.length).filter(s => s !== 0)
   return sizes.length === nrs.length && sizes.every((nr, i) => nr === nrs[i])
 }
@@ -48,12 +49,8 @@ function mightStillBePossible(line: string, largest: number) {
     if (current > max) max = current
   }
   if (current > max) max = current
-  // console.log(line, largest, max)
   return max >= largest
 }
-
-// console.log(isPossible("##..##.##".split(""), [3,2,2]))
-// console.log(isPossible(".#....#...###.".split(""), [1,1,3]))
 
 function getConfigurationsMemoized(line: string, nrs: number[]) {
   const seen = new Set<string>()
@@ -65,33 +62,45 @@ function getConfigurationsMemoized(line: string, nrs: number[]) {
     
     if (indexes.length === 0) {
       const okay = isPossible(line, nrs)
-      // console.log("Considering", line.join(""), nrs, okay)
       if (okay) return [line]
       return []
     }
   
+    function simplify(newLine: string) {
+      // while (true) {
+      //   const simpler = newLine.replaceAll("..", ".")
+      //   if (simpler.length === newLine.length) break;
+      //   newLine = simpler
+      // } 
+      return newLine.trimCharacter(".")
+    }
+
+    function doReplace(idx: number, replacement: string) {
+      const newLine = line.replaceAt(idx, replacement)
+      // if (seen.has(newLine)) return
+      // seen.add(newLine)
+      const simplified = simplify(newLine)
+      if (seen.has(simplified)) return
+      seen.add(simplified)
+      if (!mightStillBePossible(simplified, largest)) return
+      const furtherConfigurations = getConfigurations(simplified, nrs)
+      result = result.concat(furtherConfigurations)
+    }
+
     indexes.forEach(idx => {
-      [".", "#"].forEach(replacement => {
-        const newLine = line.substring(0, idx) + replacement + line.substring(idx + 1)
-        if (seen.has(newLine)) return
-        seen.add(newLine)
-        if (!mightStillBePossible(newLine, largest)) return
-        const furtherConfigurations = getConfigurations(newLine, nrs)
-        // console.log(replacement, "===>", furtherConfigurations)
-        result = result.concat(furtherConfigurations)
-      })
+      doReplace(idx, ".")
+      doReplace(idx, "#")
     })
-  
     return result
   }
-
+  
+  // console.log(seen)
   return getConfigurations(line, nrs)
 }
 
-const started = new Date().getTime()
-
 const part1 = data
   .map(({marks, nrs}, idx) => {
+    const started = new Date().getTime()
     const result = getConfigurationsMemoized(marks, nrs)
     const taken = (new Date().getTime() - started)
     console.log(`Line ${idx} after ${Math.trunc(taken / 1000)}s`, ":", marks, ": gave:", result.length)
@@ -99,8 +108,6 @@ const part1 = data
   })
   .map(options => options.length)
   .reduce(add, 0)
-
-
 
 const part2 = 0
 
