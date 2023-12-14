@@ -1,4 +1,4 @@
-import {startDay, finishDay} from './util.ts'
+import {startDay, finishDay, add} from './util.ts'
 startDay(12)
 
 let input = `
@@ -17,6 +17,11 @@ let input = `
 interface Group {
   symbol: string
   count: number
+}
+
+interface Entry {
+  groups: Group[]
+  nrs: number[]
 }
 
 function chunkByCharacter(line: string) {
@@ -40,7 +45,20 @@ const data = input
     nrs: nrs.split(",").map(n => parseInt(n))
   }))
 
+function countNumberOfArrangements(entry: Entry): number {
+  console.log(entry)
+  return 0
+}
+
 const part1 = data
+  .map((entry, index) => {
+    const started = new Date().getTime()
+    const result = countNumberOfArrangements(entry)
+    const ended = new Date().getTime()
+    console.log(`Line ${index} ran in ${ended - started}ms`)
+    return result
+  })
+  .reduce(add, 0)
 
 const part2 = 0
 
