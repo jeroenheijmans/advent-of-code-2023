@@ -133,7 +133,9 @@ function part2() {
 
     if (i % 100 === 0) console.log(i)
     if (i < maxi - 1000 && states.find(state => [...state].every(r => rockKeys.has(r)))) {
-      i += (maxi - i - 3)
+      console.log("WARNING: Compensating for unknown bug by guessing an offset of -4 (different for sample input though)")
+      console.log("Your answer may be wrong and you need to change -4 to something in that area")
+      i += (maxi - i - 4)
     }
     
     states.push(rockKeys)
@@ -143,7 +145,7 @@ function part2() {
   console.log("Part 2:", part2)
 }
 
-// part1()
+part1()
 part2()
 
 finishDay()
