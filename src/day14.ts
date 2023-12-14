@@ -38,11 +38,13 @@ for (let y = 0; y < data.length; y++) {
   }
 }
 
-let i = 0;
-while (i++ < 1000) {
+let hasMoved = true
+while (hasMoved) {
+  hasMoved = false
   rocks.forEach(rock => {
     const targetKey = `${rock.x};${rock.y - 1}`
     if (rock.y > 0 && !walls.some(w => w.key === targetKey) && !rocks.some(w => w.key === targetKey)) {
+      hasMoved = true
       rock.key = targetKey
       rock.y = rock.y - 1
     }
