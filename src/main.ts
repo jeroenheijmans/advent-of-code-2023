@@ -12,4 +12,14 @@
 // import './day12.ts';
 // import './day13.ts';
 // import './day14.ts';
-import './day15.ts';
+// import './day15.ts';
+import './day16.ts';
+// import './day17.ts';
+// import './day18.ts';
+// import './day19.ts';
+// import './day20.ts';
+// import './day21.ts';
+// import './day22.ts';
+// import './day23.ts';
+// import './day24.ts';
+// import './day25.ts';
