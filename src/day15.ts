@@ -1,8 +1,9 @@
 import {startDay, finishDay, add} from './util.ts'
 startDay(15)
 
-// const input = 'rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7'
-const input = Deno.readTextFileSync("./src/inputs/day15.txt")
+let input = 'rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7'
+
+input = Deno.readTextFileSync("./src/inputs/day15.txt")
 
 function HASH(line: string) {
   return line.split("").reduce((result, char) => ((result + char.charCodeAt(0)) * 17) % 256, 0)
@@ -16,38 +17,31 @@ const data = input
     symbol: line.replaceAll(/[a-z1-9]/g, ""),
     nr: parseInt(line.replaceAll(/[a-z=-]/g, "")) || null,
     line,
-  }))
-  .map(entry => ({
-    ...entry,
-    part1HASH: HASH(entry.line),
-    part2HASH: HASH(entry.label),
+    part1HASH: HASH(line),
+    part2HASH: HASH(line.split(/[=-]/)[0]),
   }))
 
 const part1 = data
   .map(e => e.part1HASH)
   .reduce(add, 0)
 
-const boxes = [...Array(256).keys()].map(_ => ([] as (string|number|null)[][]))
+const boxes = [...Array(256).keys()].map(_ => ([] as ({label: string, nr: number|null})[]))
 
 data.forEach(entry => {
   const box = boxes[entry.part2HASH]
-  const item = box.find(b => b[0] === entry.label)
+  const lens = box.find(b => b.label === entry.label)
 
   if (entry.symbol === "=") {
-    if (item) item[1] = entry.nr
-    else box.push([entry.label, entry.nr])
+    if (lens) lens.nr = entry.nr
+    else box.push({ label: entry.label, nr: entry.nr })
   } else {
-    boxes[entry.part2HASH] = box.filter(i => i[0] !== entry.label)
+    boxes[entry.part2HASH] = box.filter(lens => lens.label !== entry.label)
   }
 })
 
 const part2 = boxes
-  .map((box, index) => ({
-    fullNr: (index + 1),
-    parts: box.map((item, index2) => ({ slotNr: index2 + 1, focalLength: item[1] as number }))
-  }))
-  .filter(i => i.parts.length > 0)
-  .map(box => box.parts.map(p => box.fullNr * p.slotNr * p.focalLength).reduce(add, 0))
+  .map((box, boxIdx) => box.map((item, lensIdx) => (boxIdx + 1) * (lensIdx + 1) * (item.nr as number)))
+  .flat()
   .reduce(add, 0)
 
 console.log("Part 1:", part1)
