@@ -83,8 +83,8 @@ while (beams.length > 0) {
     const key = `${current.position.x};${current.position.y}`
     
     if (emptySpaces.has(key)) energized.add(key)
-    visited.add(key)
-    
+    if (current.position.x >= 0) visited.add(key)
+
     current.position.x += current.direction.x
     current.position.y += current.direction.y
     
