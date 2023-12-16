@@ -23,19 +23,49 @@ const data = input
   }))
 
 function isValid(line: string, nrs: number[]) {
-  const found = []
-  let previous = "."
+  let currentGroupSize = 0
+  let idx = 0
+  let next = ""
 
   for (let i = 0; i < line.length; i++) {
-    const next = line[i]
+    next = line[i]
 
-    if (next === "?") throw "Validness check with '?' is not possible"
-    if (next === "#" && previous === ".") found.push(0)
-    if (next === "#") found[found.length - 1]++
+    if (next === "." && currentGroupSize !== 0) {
+      if (currentGroupSize !== nrs[idx++]) return false
+      currentGroupSize = 0
+    }
 
-    previous = next
+    if (next === "#") currentGroupSize++
   }
-  return areArraysEqual(nrs, found)
+  
+  if (next === "#") return currentGroupSize === nrs[idx++] && idx === nrs.length
+  if (next === ".") return idx === nrs.length
+
+  return idx === nrs.length
+}
+
+function mightStillBeValid(line: string, nrs: number[]) {
+  let currentGroupSize = 0
+  let idx = 0
+  let next = ""
+
+  for (let i = 0; i < line.length; i++) {
+    next = line[i]
+
+    if (next === "?") return true
+
+    if (next === "." && currentGroupSize !== 0) {
+      if (currentGroupSize !== nrs[idx++]) return false
+      currentGroupSize = 0
+    }
+
+    if (next === "#") currentGroupSize++
+  }
+  
+  if (next === "#") return currentGroupSize === nrs[idx++] && idx === nrs.length
+  if (next === ".") return idx === nrs.length
+
+  return idx === nrs.length
 }
 
 function getArrangements(input: string, nrs: number[]) {
@@ -51,10 +81,13 @@ function getArrangements(input: string, nrs: number[]) {
     if (index < 0) {
       if (isValid(line, nrs)) possibilities.add(line)
       return
-    } 
-    
-    buildPossibilities(line.replaceAt(index, "."))
-    buildPossibilities(line.replaceAt(index, "#"))
+    }
+
+    const option1 = line.replaceAt(index, ".")
+    const option2 = line.replaceAt(index, "#")
+
+    if (mightStillBeValid(option1, nrs)) buildPossibilities(option1)
+    if (mightStillBeValid(option2, nrs)) buildPossibilities(option2)
   }
 
   buildPossibilities(input)
@@ -64,10 +97,10 @@ function getArrangements(input: string, nrs: number[]) {
 
 const part1 = data
   .map(({line, nrs}, index) => {
-    // const started = new Date().getTime()
+    const started = new Date().getTime()
     const result = getArrangements(line, nrs)
-    // const ended = new Date().getTime()
-    // console.log(`Line ${index} ran in ${ended - started}ms`)
+    const ended = new Date().getTime()
+    console.log(`Line ${index + 1} ran in ${ended - started}ms`)
     return result.size
   })
   .reduce(add, 0)
