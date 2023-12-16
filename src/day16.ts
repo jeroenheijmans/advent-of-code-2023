@@ -70,46 +70,62 @@ const lookup = bodies
     return result
   }, {} as Record<string, Body>)
 
-const emptySpaces = new Set(bodies.filter(b => b.char === ".").map(b => b.key))
-const energized = new Set<string>()
-const visited = new Set<string>()
-const beamKeys = new Set<string>()
-let beams = [{position: {x:-1, y:0}, direction: {x:1, y:0}}]
+function getEnergizedSizeFrom(position: Point, direction: Point) {
+  const emptySpaces = new Set(bodies.filter(b => b.char === ".").map(b => b.key))
+  const energized = new Set<string>()
+  const visited = new Set<string>()
+  const beamKeys = new Set<string>()
+  let beams = [{position, direction}]
 
-while (beams.length > 0) {
-  const newBeams: Beam[] = []
+  while (beams.length > 0) {
+    const newBeams: Beam[] = []
 
-  beams.forEach(current => {
-    const key = `${current.position.x};${current.position.y}`
-    
-    if (emptySpaces.has(key)) energized.add(key)
-    if (current.position.x >= 0) visited.add(key)
+    beams.forEach(current => {
+      const key = `${current.position.x};${current.position.y}`
+      
+      if (emptySpaces.has(key)) energized.add(key)
+      if (current.position.x >= 0) visited.add(key)
 
-    current.position.x += current.direction.x
-    current.position.y += current.direction.y
-    
-    const newKey = `${current.position.x};${current.position.y}`
-    const body = lookup[newKey]
+      current.position.x += current.direction.x
+      current.position.y += current.direction.y
+      
+      const newKey = `${current.position.x};${current.position.y}`
+      const body = lookup[newKey]
 
-    if (body) {
-      // console.log("Encountered body", body);
-      // drawGrid(data[0].length, data.length, (x, y) => visited.has(`${x};${y}`) ? (energized.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].char) : ".")
-      // console.log()
-      body.changeBeam(current).forEach(b => newBeams.push(b));
-    }
-    else if (emptySpaces.has(newKey)) {
-      newBeams.push(current)
-    }
-  })
+      if (body) {
+        // console.log("Encountered body", body);
+        // drawGrid(data[0].length, data.length, (x, y) => visited.has(`${x};${y}`) ? (energized.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].char) : ".")
+        // console.log()
+        body.changeBeam(current).forEach(b => newBeams.push(b));
+      }
+      else if (emptySpaces.has(newKey)) {
+        newBeams.push(current)
+      }
+    })
 
-  beams = newBeams.filter(b => !beamKeys.has(`${b.position.x};${b.position.y};${b.direction.x};${b.direction.y}`))
-  beams.forEach(b => beamKeys.add(`${b.position.x};${b.position.y};${b.direction.x};${b.direction.y}`))
+    beams = newBeams.filter(b => !beamKeys.has(`${b.position.x};${b.position.y};${b.direction.x};${b.direction.y}`))
+    beams.forEach(b => beamKeys.add(`${b.position.x};${b.position.y};${b.direction.x};${b.direction.y}`))
+  }
+
+  return visited.size
 }
 
 // drawGrid(data[0].length, data.length, (x, y) => visited.has(`${x};${y}`) ? (energized.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].char) : ".")
 
-const part1 = visited.size
-const part2 = 0
+const part1 = getEnergizedSizeFrom({x:-1, y:0}, {x:1, y:0})
+let part2 = 0
+
+for (let y=0; y<data.length; y++) {
+  const one = getEnergizedSizeFrom({ x: -1, y }, { x: +1, y: 0 })
+  const two = getEnergizedSizeFrom({ x: data[0].length, y }, { x: -1, y: 0 })
+  part2 = Math.max(part2, one, two)
+}
+
+for (let x=0; x<data.length; x++) {
+  const one = getEnergizedSizeFrom({ x, y: -1 }, { x: 0, y: +1 })
+  const two = getEnergizedSizeFrom({ x, y: data.length }, { x: 0, y: -1 })
+  part2 = Math.max(part2, one, two)
+}
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
