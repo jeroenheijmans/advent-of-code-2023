@@ -1,4 +1,4 @@
-import {startDay, finishDay, add, areArraysEqual} from './util.ts'
+import {startDay, finishDay, add} from './util.ts'
 startDay(12)
 
 let input = `
@@ -10,9 +10,12 @@ let input = `
 ?###???????? 3,2,1
 `
 
-input = Deno.readTextFileSync("./src/inputs/day12.txt")
+// input = '????.#...#... 4,1,1'
+// input = '????.######..#####. 1,6,5'
+// input = Deno.readTextFileSync("./src/inputs/day12.txt")
 
 const data = input
+  .replaceAll(/(\.\.)+/g, ".")
   .trim()
   .split(/\r?\n/)
   .filter(x => x)
@@ -92,6 +95,8 @@ function getArrangements(input: string, nrs: number[]) {
 
   buildPossibilities(input)
 
+  //console.log("\nFound possibilities for:\n"+input+"\n")
+  //console.log([...possibilities].join("\n"))
   return possibilities
 }
 
@@ -105,7 +110,18 @@ const part1 = data
   })
   .reduce(add, 0)
 
-const part2 = 0
+const part2 = data
+  .map(({line, nrs}, index) => {
+    const started = new Date().getTime()
+    const result = getArrangements(
+      [line, line, line, line, line].join("?"),
+      [...nrs, ...nrs, ...nrs, ...nrs, ...nrs]
+    )
+    const ended = new Date().getTime()
+    console.log(`Line ${index + 1} ran in ${ended - started}ms`)
+    return result.size
+  })
+  .reduce(add, 0)
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
