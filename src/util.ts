@@ -25,7 +25,7 @@ export async function checkTimeout() {
   await new Promise(resolve => setTimeout(resolve));
 }
 
-export interface Point {
+export interface Vector2 {
   x: number;
   y: number;
 }

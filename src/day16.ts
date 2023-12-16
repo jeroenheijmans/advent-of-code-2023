@@ -1,12 +1,12 @@
-import {startDay, finishDay, Point, drawGrid} from './util.ts'
+import {startDay, finishDay, Vector2, drawGrid} from './util.ts'
 startDay(16)
 
 let input = Deno.readTextFileSync("./src/inputs/day16_example.txt") // Backslashes in example are awkward to inline
 input = Deno.readTextFileSync("./src/inputs/day16.txt")
 
 interface Beam {
-  position: Point;
-  direction: Point;
+  position: Vector2;
+  direction: Vector2;
 }
 
 class Body {
@@ -70,7 +70,7 @@ const lookup = bodies
     return result
   }, {} as Record<string, Body>)
 
-function getEnergizedSizeFrom(position: Point, direction: Point) {
+function getEnergizedSizeFrom(position: Vector2, direction: Vector2) {
   const emptySpaces = new Set(bodies.filter(b => b.char === ".").map(b => b.key))
   const energized = new Set<string>()
   const visited = new Set<string>()
@@ -93,9 +93,6 @@ function getEnergizedSizeFrom(position: Point, direction: Point) {
       const body = lookup[newKey]
 
       if (body) {
-        // console.log("Encountered body", body);
-        // drawGrid(data[0].length, data.length, (x, y) => visited.has(`${x};${y}`) ? (energized.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].char) : ".")
-        // console.log()
         body.changeBeam(current).forEach(b => newBeams.push(b));
       }
       else if (emptySpaces.has(newKey)) {
@@ -113,18 +110,23 @@ function getEnergizedSizeFrom(position: Point, direction: Point) {
 // drawGrid(data[0].length, data.length, (x, y) => visited.has(`${x};${y}`) ? (energized.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].char) : ".")
 
 const part1 = getEnergizedSizeFrom({x:-1, y:0}, {x:1, y:0})
+
 let part2 = 0
 
 for (let y=0; y<data.length; y++) {
-  const one = getEnergizedSizeFrom({ x: -1, y }, { x: +1, y: 0 })
-  const two = getEnergizedSizeFrom({ x: data[0].length, y }, { x: -1, y: 0 })
-  part2 = Math.max(part2, one, two)
+  part2 = Math.max(
+    part2,
+    getEnergizedSizeFrom({ x: -1, y }, { x: +1, y: 0 }),
+    getEnergizedSizeFrom({ x: data[0].length, y }, { x: -1, y: 0 }),
+  )
 }
 
 for (let x=0; x<data.length; x++) {
-  const one = getEnergizedSizeFrom({ x, y: -1 }, { x: 0, y: +1 })
-  const two = getEnergizedSizeFrom({ x, y: data.length }, { x: 0, y: -1 })
-  part2 = Math.max(part2, one, two)
+  part2 = Math.max(
+    part2,
+    getEnergizedSizeFrom({ x, y: -1 }, { x: 0, y: +1 }),
+    getEnergizedSizeFrom({ x, y: data.length }, { x: 0, y: -1 }),
+  )
 }
 
 console.log("Part 1:", part1)
