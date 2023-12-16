@@ -74,7 +74,7 @@ const emptySpaces = new Set(bodies.filter(b => b.char === ".").map(b => b.key))
 const energized = new Set<string>()
 const visited = new Set<string>()
 const beamKeys = new Set<string>()
-let beams = [{position: {x:0, y:0}, direction: {x:1, y:0}}]
+let beams = [{position: {x:-1, y:0}, direction: {x:1, y:0}}]
 
 while (beams.length > 0) {
   const newBeams: Beam[] = []
@@ -106,7 +106,7 @@ while (beams.length > 0) {
   beams.forEach(b => beamKeys.add(`${b.position.x};${b.position.y};${b.direction.x};${b.direction.y}`))
 }
 
-// drawGrid(data[0].length, data.length, (x, y) => visited.has(`${x};${y}`) ? "#" : ".")
+// drawGrid(data[0].length, data.length, (x, y) => visited.has(`${x};${y}`) ? (energized.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].char) : ".")
 
 const part1 = visited.size
 const part2 = 0
