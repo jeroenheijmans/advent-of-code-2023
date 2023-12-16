@@ -25,6 +25,11 @@ export async function checkTimeout() {
   await new Promise(resolve => setTimeout(resolve));
 }
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export function add(a: number, b: number) {
   return a + b;
 }
@@ -63,4 +68,14 @@ String.prototype.trimCharacter = function(character: string) {
 
 String.prototype.replaceAt = function(index, replacement) {
   return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+}
+
+export function drawGrid(maxx: number, maxy: number, draw: (x: number, y: number) => string) {
+  for (let y = 0; y < maxy; y++) {
+    let line = ""
+    for (let x = 0; x < maxx; x++) {
+      line += draw(x, y)
+    }
+    console.log(line)
+  }
 }
