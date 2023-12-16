@@ -33,7 +33,7 @@ Here's what I learned (or noticed) each day.
 13. There's probably no digital task where Excel cannot play a role.
 14. Buggy code can incidentally be just fine.
 15. Preciseness can be a virtue.
-16. TODO
+16. Hindsight is 20/20.
 17. TODO
 18. TODO
 19. TODO
