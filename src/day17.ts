@@ -54,9 +54,9 @@ function solve() {
   ]
 
   while (edges.length > 0) {
-    console.log(cost)
+    // console.log(cost)
     // if (cost > 121) console.log(cost, edges.toSorted((a,b)=>a.energy-b.energy))
-    // if (cost ===18) { draw(); console.log()}
+    // if (cost === 13) { draw(); console.log()}
     const newEdges = [] as Crucible[]
 
     for (const c of edges) {
@@ -71,15 +71,15 @@ function solve() {
       if (c.totalCost < cost) throw "Unexpectedly skipped crucible"
       
       if (c.x === maxx && c.y === maxy) {
-        draw()
+        // draw()
         return c.totalCost
       }
       
       visited.add(crucibleKey)
       path.add(`${c.x};${c.y}`)
 
-      // Straight ahead
-      if (c.energy > 0 && lookup[`${c.x + c.vx};${c.y + c.vy}`]) {
+      // Straight ahead (if possible)
+      if (c.energy > 1 && lookup[`${c.x + c.vx};${c.y + c.vy}`]) {
         newEdges.push({
           x: c.x + c.vx,
           y: c.y + c.vy,
@@ -91,13 +91,17 @@ function solve() {
       }
 
       // Turns
-      const turns = c.vy === 0 ? [{vx: 0, vy: -1}, {vx: 0, vy: +1}] : [{vx: +1, vy: 0}, {vx: -1, vy: 0}]
+      const turns = c.vy === 0
+        ? [{vx: 0, vy: -1}, {vx: 0, vy: +1}]
+        : [{vx: +1, vy: 0}, {vx: -1, vy: 0}]
+
       turns.forEach(turn => {
         if (lookup[`${c.x + turn.vx};${c.y + turn.vy}`]) {
           newEdges.push({
             x: c.x + turn.vx,
             y: c.y + turn.vy,
-            ...turn,
+            vx: turn.vx,
+            vy: turn.vy,
             energy: 3,
             totalCost: c.totalCost + lookup[`${c.x + turn.vx};${c.y + turn.vy}`].cost
           })
@@ -108,7 +112,6 @@ function solve() {
     edges = newEdges
     cost++
   }
-
 
   throw "Search returned no result"
 }
