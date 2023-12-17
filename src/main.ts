@@ -14,8 +14,8 @@
 // import './day14.ts';
 // import './day15.ts';
 // import './day16.ts';
-import './day17.ts';
-// import './day18.ts';
+// import './day17.ts';
+import './day18.ts';
 // import './day19.ts';
 // import './day20.ts';
 // import './day21.ts';
