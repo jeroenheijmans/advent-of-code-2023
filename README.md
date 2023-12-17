@@ -34,7 +34,7 @@ Here's what I learned (or noticed) each day.
 14. Buggy code can incidentally be just fine.
 15. Preciseness can be a virtue.
 16. Hindsight is 20/20.
-17. TODO
+17. Path finding algorithms can be hard.
 18. TODO
 19. TODO
 20. TODO
