@@ -63,6 +63,7 @@ function mightStillBeValid(line: string, nrs: number[]) {
     }
 
     if (next === "#") currentGroupSize++
+    if (currentGroupSize > nrs[idx]) return false
   }
   
   if (next === "#") return currentGroupSize === nrs[idx++] && idx === nrs.length
@@ -72,17 +73,14 @@ function mightStillBeValid(line: string, nrs: number[]) {
 }
 
 function getArrangements(input: string, nrs: number[]) {
-  const possibilities = new Set<string>()
-  const seen = new Set<string>()
+  let possibilities = 0
 
   function buildPossibilities(line: string) {
-    if (seen.has(line)) return
-    seen.add(line)
 
     const index = line.indexOf("?")
 
     if (index < 0) {
-      if (isValid(line, nrs)) possibilities.add(line)
+      if (isValid(line, nrs)) possibilities++
       return
     }
 
@@ -95,35 +93,36 @@ function getArrangements(input: string, nrs: number[]) {
 
   buildPossibilities(input)
 
-  //console.log("\nFound possibilities for:\n"+input+"\n")
-  //console.log([...possibilities].join("\n"))
   return possibilities
 }
 
 const part1 = data
   .map(({line, nrs}, index) => {
     const started = new Date().getTime()
-    const result = getArrangements(line, nrs)
+    const result = getArrangements(
+      line.replaceAll(/\.\./g, '.'),
+      nrs,
+    )
     const ended = new Date().getTime()
     console.log(`Line ${index + 1} ran in ${ended - started}ms`)
-    return result.size
+    return result
   })
   .reduce(add, 0)
+
+console.log("Part 1:", part1)
 
 const part2 = data
   .map(({line, nrs}, index) => {
     const started = new Date().getTime()
     const result = getArrangements(
-      [line, line, line, line, line].join("?"),
+      [line, line, line, line, line].join("?").replaceAll(/\.\./g, '.'),
       [...nrs, ...nrs, ...nrs, ...nrs, ...nrs]
     )
     const ended = new Date().getTime()
     console.log(`Line ${index + 1} ran in ${ended - started}ms`)
-    return result.size
+    return result
   })
   .reduce(add, 0)
-
-console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
 finishDay()
