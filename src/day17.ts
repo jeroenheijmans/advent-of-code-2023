@@ -46,7 +46,7 @@ function solve() {
   let cost = 0
   const visited = new Set<string>()
   const path = new Set<string>()
-  const draw = () => drawGrid(maxx + 1, maxy + 1, (x,y) => path.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].cost.toString())
+  // const draw = () => drawGrid(maxx + 1, maxy + 1, (x,y) => path.has(`${x};${y}`) ? "#" : lookup[`${x};${y}`].cost.toString())
 
   let edges = [
     { x:0, y:0, vx: +1, vy: 0, energy: 3, totalCost: 0},
@@ -54,9 +54,6 @@ function solve() {
   ]
 
   while (edges.length > 0) {
-    // console.log(cost)
-    // if (cost > 121) console.log(cost, edges.toSorted((a,b)=>a.energy-b.energy))
-    // if (cost === 13) { draw(); console.log()}
     const newEdges = [] as Crucible[]
 
     for (const c of edges) {
@@ -70,10 +67,7 @@ function solve() {
       
       if (c.totalCost < cost) throw "Unexpectedly skipped crucible"
       
-      if (c.x === maxx && c.y === maxy) {
-        // draw()
-        return c.totalCost
-      }
+      if (c.x === maxx && c.y === maxy) return c.totalCost
       
       visited.add(crucibleKey)
       path.add(`${c.x};${c.y}`)
