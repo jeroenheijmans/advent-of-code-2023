@@ -18,20 +18,20 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
-// input = `
-// R 2 (#000000)
-// D 2 (#000000)
-// R 3 (#000000)
-// U 2 (#000000)
-// R 4 (#000000)
-// D 4 (#000000)
-// L 3 (#000000)
-// D 3 (#000000)
-// R 3 (#000000)
-// D 3 (#000000)
-// L 9 (#000000)
-// U 9 (#000000)
-// `
+input = `
+R 2 (#000000)
+D 2 (#000000)
+R 3 (#000000)
+U 2 (#000000)
+R 4 (#000000)
+D 4 (#000000)
+L 3 (#000000)
+D 3 (#000000)
+R 3 (#000000)
+D 3 (#000000)
+L 9 (#000000)
+U 9 (#000000)
+`
 
 
 // input = Deno.readTextFileSync("./src/inputs/day18.txt")
@@ -110,7 +110,6 @@ function solve1() {
     edges = newEdges
   }
 
-
   draw()
   return visited.size + Object.values(lookup).length
 }
@@ -179,16 +178,8 @@ for (let x = minx; x <= maxx; x++) {
   while (y < boty) {
     nextHorizontalBorder = relevantHorizontalBorders.shift()
     const nexty = nextHorizontalBorder!.from.y
-    
-    if (x === 1) console.log(nextHorizontalBorder)
-    
-    if (isInside) columnTotal += nexty - y - 1
-    if (x !== nextHorizontalBorder?.from.x && x !== nextHorizontalBorder?.to.x) { // not on a corner
-      isInside = !isInside
-    }
-
-    // if (relevantVerticalBorders[0].from.y === y) part2 += (relevantVerticalBorders[0].to.y - relevantVerticalBorders[0].from.y)
-
+    if (isInside) columnTotal += nexty - y
+    isInside = !isInside
     y = nexty
   }
 
