@@ -18,6 +18,22 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
+// input = `
+// R 2 (#000000)
+// D 2 (#000000)
+// R 3 (#000000)
+// U 2 (#000000)
+// R 4 (#000000)
+// D 4 (#000000)
+// L 3 (#000000)
+// D 3 (#000000)
+// R 3 (#000000)
+// D 3 (#000000)
+// L 9 (#000000)
+// U 9 (#000000)
+// `
+
+
 // input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
@@ -36,11 +52,30 @@ const instructionsPart1 = raw
     hex
   }))
 
-function solve1() {
-  const visited = new Set<string>()
-  let location = {x:0, y:0}
-  const lookup = { "0;0": location } as Record<string, {x:number, y:number}>
+let location = {x:0, y:0}
+const lookup = { "0;0": location } as Record<string, {x:number, y:number}>
+const visited = new Set<string>()
+const debuglocs = new Set<string>()
 
+function draw() {
+  const maxx = Math.max(...[...Object.values(lookup)].map(n => n.x)) + 1
+  const maxy = Math.max(...[...Object.values(lookup)].map(n => n.y)) + 1
+  const minx = Math.min(...[...Object.values(lookup)].map(n => n.x)) + 1
+  const miny = Math.min(...[...Object.values(lookup)].map(n => n.y)) + 1
+  for (let y = miny - 1; y < maxy; y++) {
+    let line = ""
+    for (let x = minx - 1; x < maxx; x++) {
+      const key = `${x};${y}`
+      if (debuglocs.has(key))
+        line += "o"
+      else
+        line += lookup[key] ? "#" : (visited.has(key) ? "x" : ".")
+    }
+    console.log(line)
+  }
+}
+
+function solve1() {
   instructionsPart1.forEach(instruction => {
     for (let i = 0; i < instruction.distance; i++) {
       location = {...location}
@@ -75,19 +110,6 @@ function solve1() {
     edges = newEdges
   }
 
-  function draw() {
-    const maxx = Math.max(...[...Object.values(lookup)].map(n => n.x)) + 1
-    const maxy = Math.max(...[...Object.values(lookup)].map(n => n.y)) + 1
-    const minx = Math.min(...[...Object.values(lookup)].map(n => n.x)) + 1
-    const miny = Math.min(...[...Object.values(lookup)].map(n => n.y)) + 1
-    for (let y = miny - 1; y < maxy; y++) {
-      let line = ""
-      for (let x = minx - 1; x < maxx; x++) {
-        line += lookup[`${x};${y}`] ? "#" : (visited.has(`${x};${y}`) ? "x" : ".")
-      }
-      console.log(line)
-    }
-  }
 
   draw()
   return visited.size + Object.values(lookup).length
@@ -134,6 +156,13 @@ const horizontalBorders = borders
 
 const verticalBorders = borders
   .filter(b => b.from.y !== b.to.y)
+  .toSorted((a, b) => {
+    const dx = a.from.x - b.from.x
+    if (dx !== 0) return dx < 0 ? -1 : +1
+    const dy = a.from.y - b.from.y
+    if (dy !== 0) return dy < 0 ? -1 : +1
+    return 0
+  })
 
 let part2 = 0
 
@@ -141,26 +170,30 @@ for (let x = minx; x <= maxx; x++) {
   const relevantHorizontalBorders = horizontalBorders.filter(b => x >= b.from.x && x <= b.to.x)
   const relevantVerticalBorders = verticalBorders.filter(b => b.from.x === x)
 
-  let isInside = false
+  let columnTotal = 0
+  let nextHorizontalBorder = relevantHorizontalBorders.shift()
+  let y = nextHorizontalBorder!.from.y
+  let isInside = true
+  const boty = relevantHorizontalBorders[relevantHorizontalBorders.length - 1].to.y
 
-  for (let y = miny - 1; y <= maxy + 1; y++) {
-    let justWentOutOfBounds = false
-
-    if (relevantHorizontalBorders.length === 0) break
-
-    if (relevantHorizontalBorders[0].from.y === y) {
-      justWentOutOfBounds = isInside
+  while (y < boty) {
+    nextHorizontalBorder = relevantHorizontalBorders.shift()
+    const nexty = nextHorizontalBorder!.from.y
+    
+    if (x === 1) console.log(nextHorizontalBorder)
+    
+    if (isInside) columnTotal += nexty - y - 1
+    if (x !== nextHorizontalBorder?.from.x && x !== nextHorizontalBorder?.to.x) { // not on a corner
       isInside = !isInside
-      const _ = relevantHorizontalBorders.shift()
     }
 
-    if (isInside || justWentOutOfBounds || relevantVerticalBorders.find(b => y >= b.from.y && y <= b.to.y)) {
-      // console.log("At", x, ",", y, "adding one")
-      part2++
-    }
-    // else console.log("  At", x, ",", y, "adding nothing")
+    // if (relevantVerticalBorders[0].from.y === y) part2 += (relevantVerticalBorders[0].to.y - relevantVerticalBorders[0].from.y)
+
+    y = nexty
   }
-  // console.log()
+
+  console.log(x, " = ", columnTotal)
+  part2 += columnTotal + relevantVerticalBorders.map(b => b.to.y - b.from.y).reduce(add, 0)
 }
 
 console.log("Part 1:", part1)
