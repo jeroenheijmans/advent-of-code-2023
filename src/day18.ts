@@ -1,4 +1,4 @@
-import {startDay, finishDay, drawGrid} from './util.ts'
+import {startDay, finishDay, drawGrid, Vector2, add} from './util.ts'
 startDay(18)
 
 let input = `
@@ -20,15 +20,24 @@ U 2 (#7a21e3)
 
 // input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
-const data = input
+const raw = input
   .trim()
   .split(/\r?\n/)
   .filter(x => x)
   .map(line => line.replaceAll(/[\(\)#]/g, ""))
   .map(line => line.split(" "))
+
+const dirs = {
+  "U": 3,
+  "L": 2,
+  "D": 1,
+  "R": 0,
+}
+
+const data = raw
   .map(([direction, length, hex]) => ({
-    direction,
-    length: parseInt(length),
+    direction: dirs[direction as "U"|"L"|"D"|"R"],
+    distance: parseInt(length),
     hex
   }))
 
@@ -37,12 +46,12 @@ function solve1() {
   const lookup = { "0;0": location } as Record<string, {x:number, y:number}>
 
   data.forEach(instruction => {
-    for (let i = 0; i < instruction.length; i++) {
+    for (let i = 0; i < instruction.distance; i++) {
       location = {...location}
-      if (instruction.direction === "U") location.y += -1
-      if (instruction.direction === "L") location.x += -1
-      if (instruction.direction === "D") location.y += +1
-      if (instruction.direction === "R") location.x += +1
+      if (instruction.direction === 3) location.y += -1
+      if (instruction.direction === 2) location.x += -1
+      if (instruction.direction === 1) location.y += +1
+      if (instruction.direction === 0) location.x += +1
       lookup[`${location.x};${location.y}`] = location
     }
   })
@@ -71,25 +80,79 @@ function solve1() {
     edges = newEdges
   }
 
-  // const maxx = Math.max(...[...Object.values(lookup)].map(n => n.x)) + 1
-  // const maxy = Math.max(...[...Object.values(lookup)].map(n => n.y)) + 1
-  // const minx = Math.min(...[...Object.values(lookup)].map(n => n.x)) + 1
-  // const miny = Math.min(...[...Object.values(lookup)].map(n => n.y)) + 1
-  // for (let y = miny - 1; y < maxy; y++) {
-  //   let line = ""
-  //   for (let x = minx - 1; x < maxx; x++) {
-  //     line += lookup[`${x};${y}`] ? "#" : (visited.has(`${x};${y}`) ? "x" : ".")
-  //   }
-  //   console.log(line)
-  // }
+  const maxx = Math.max(...[...Object.values(lookup)].map(n => n.x)) + 1
+  const maxy = Math.max(...[...Object.values(lookup)].map(n => n.y)) + 1
+  const minx = Math.min(...[...Object.values(lookup)].map(n => n.x)) + 1
+  const miny = Math.min(...[...Object.values(lookup)].map(n => n.y)) + 1
+  for (let y = miny - 1; y < maxy; y++) {
+    let line = ""
+    for (let x = minx - 1; x < maxx; x++) {
+      line += lookup[`${x};${y}`] ? "#" : (visited.has(`${x};${y}`) ? "x" : ".")
+    }
+    console.log(line)
+  }
 
   return visited.size + Object.values(lookup).length
 }
 
 const part1 = solve1()
 
+const instructions = raw
+  .map(([_1, _2, hex]) => ({
+    direction: parseInt(hex.split("")[hex.length - 1]),
+    distance: parseInt(hex.substring(0, 5), 16)
+  }))
 
-const part2 = 0
+let from = {x:0, y:0}
+let to = {x:0, y:0}
+const borders = [] as {from:Vector2, to:Vector2}[]
+const corners = [to] as Vector2[]
+
+data // instructions
+  .forEach(instruction => {
+  from = {...to}
+  to = {...to}
+  if (instruction.direction === 0) to.x += +instruction.distance
+  if (instruction.direction === 1) to.y += +instruction.distance
+  if (instruction.direction === 2) to.x += -instruction.distance
+  if (instruction.direction === 3) to.y += -instruction.distance
+  borders.push({from, to})
+  corners.push(to)
+})
+
+const minx = Math.min(...corners.map(c => c.x))
+const maxx = Math.max(...corners.map(c => c.x))
+
+const horizontalBorders = borders.filter(b => b.from.x !== b.to.x).toSorted((a,b) => a.from.y - b.from.y)
+const verticalBorders = borders.filter(b => b.from.y !== b.to.y).toSorted((a,b) => a.from.x - b.from.x)
+
+let part2 = 0
+
+for (let x = minx; x <= maxx; x++) {
+  const relevantBorders = horizontalBorders.filter(b => Math.min(b.from.x, b.to.x) <= x && Math.max(b.to.x, b.from.x) >= x)
+
+  const relevantBars = verticalBorders.filter(b => b.from.x === x)
+  const barLengths = relevantBars.map(b => Math.max(b.from.y, b.to.y) - Math.min(b.from.y, b.to.y) + 1).reduce(add, 0)
+  // part2 += barLengths
+
+  for (let idx = 0; idx < relevantBorders.length - 1; idx += 2) {
+    const border1 = relevantBorders[idx]
+    const border2 = relevantBorders[idx + 1]
+    const startx1 = Math.min(border1.from.x, border1.to.x)
+    const startx2 = Math.min(border2.from.x, border2.to.x)
+    const endx1 = Math.max(border1.from.x, border1.to.x)
+    const endx2 = Math.max(border2.from.x, border2.to.x)
+
+    if (startx1 === startx2 && x === startx1) continue
+    if (endx1 === endx2 && x === endx1) continue
+
+    const nrOfFills = border2.from.y - border1.from.y - 1
+    // console.log("At", x, "adding", nrOfFills)
+    part2 += nrOfFills
+  }
+}
+
+part2 += borders.map(b => Math.abs(b.from.x - b.to.x) + Math.abs(b.from.y - b.to.y)).reduce(add, 0)
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
