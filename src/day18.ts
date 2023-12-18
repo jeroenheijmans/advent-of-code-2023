@@ -18,7 +18,7 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day18.txt")
+input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
   .trim()
@@ -41,6 +41,8 @@ const data = raw
     hex
   }))
 
+const visited = new Set<string>() // outer scope so we can use it for part 2 debugging...
+
 function solve1() {
   let location = {x:0, y:0}
   const lookup = { "0;0": location } as Record<string, {x:number, y:number}>
@@ -56,7 +58,6 @@ function solve1() {
     }
   })
 
-  const visited = new Set<string>()
   const start = {x:1, y:1} // this is a guess!
   let edges = [start] 
   const vectors = [{dx: 0, dy: -1}, {dx: 0, dy: +1}, {dx: -1, dy: 0}, {dx: +1, dy: 0}]
@@ -124,16 +125,11 @@ const minx = Math.min(...corners.map(c => c.x))
 const maxx = Math.max(...corners.map(c => c.x))
 
 const horizontalBorders = borders.filter(b => b.from.x !== b.to.x).toSorted((a,b) => a.from.y - b.from.y)
-const verticalBorders = borders.filter(b => b.from.y !== b.to.y).toSorted((a,b) => a.from.x - b.from.x)
 
 let part2 = 0
 
 for (let x = minx; x <= maxx; x++) {
   const relevantBorders = horizontalBorders.filter(b => Math.min(b.from.x, b.to.x) <= x && Math.max(b.to.x, b.from.x) >= x)
-
-  const relevantBars = verticalBorders.filter(b => b.from.x === x)
-  const barLengths = relevantBars.map(b => Math.max(b.from.y, b.to.y) - Math.min(b.from.y, b.to.y) + 1).reduce(add, 0)
-  // part2 += barLengths
 
   for (let idx = 0; idx < relevantBorders.length - 1; idx += 2) {
     const border1 = relevantBorders[idx]
@@ -149,10 +145,16 @@ for (let x = minx; x <= maxx; x++) {
     const nrOfFills = border2.from.y - border1.from.y - 1
     // console.log("At", x, "adding", nrOfFills)
     part2 += nrOfFills
+
+    for (let y = border1.from.y; y <= border2.from.y; y++) {
+      visited.delete(`${x};${y}`)
+    }
   }
 }
 
 part2 += borders.map(b => Math.abs(b.from.x - b.to.x) + Math.abs(b.from.y - b.to.y)).reduce(add, 0)
+
+console.log([...visited].map(v => "[" + v.replace(";", ",") + "]").map(v => JSON.parse(v)))
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
