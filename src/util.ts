@@ -79,3 +79,5 @@ export function drawGrid(maxx: number, maxy: number, draw: (x: number, y: number
     console.log(line)
   }
 }
+
+export const isString = (value: unknown) => typeof value === 'string' || value instanceof String;
