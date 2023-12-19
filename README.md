@@ -29,14 +29,14 @@ Here's what I learned (or noticed) each day.
 9. Coding for speed is something else.
 10. Lack of sleep lowers effective IQ.
 11. Off by one: the second hardest thing in computer science.
-12. TODO
+12. Hard problems are *hard*
 13. There's probably no digital task where Excel cannot play a role.
 14. Buggy code can incidentally be just fine.
 15. Preciseness can be a virtue.
 16. Hindsight is 20/20.
 17. Path finding algorithms can be hard.
-18. TODO
-19. TODO
+18. Knowing how to do something !== Being able to to do something
+19. Sometimes you've got to work your way backwards?
 20. TODO
 21. TODO
 22. TODO
