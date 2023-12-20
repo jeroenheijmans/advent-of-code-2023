@@ -42,14 +42,20 @@ const modules = input
     signal: false,
     memories: {},
   } as Module))
+  // .toSorted((a, b) => a.name.localeCompare(b.name))
+  .toSorted((a, b) => {
+    const one = a.type.localeCompare(b.type)
+    if (one === 0) return a.name.localeCompare(b.name)
+    return one
+  })
 
 const lookup = modules.reduce((result, next) => {
   result[next.name] = next
   return result
 }, {} as Record<string, Module>)
 
-const outputs = new Set(modules.map(m => m.targetKeys).flat().filter(key => !lookup[key]))
-for (const name of outputs) {
+const outputNames = new Set(modules.map(m => m.targetKeys).flat().filter(key => !lookup[key]))
+for (const name of outputNames) {
   const module = {
     type: "untyped",
     name,
@@ -61,6 +67,7 @@ for (const name of outputs) {
   modules.push(module)
   lookup[name] = module
 }
+const outputModules = [...outputNames].toSorted().map(k => lookup[k])
 
 modules.forEach(m => m.targets = m.targetKeys.map(key => lookup[key]))
 modules
@@ -78,7 +85,7 @@ interface Pulse {
   value: boolean,
 }
 
-const max = 1000
+const max = 1e3
 const broadcaster = lookup["broadcaster"]
 const debug = max < 5
   ? (message: string) => console.log(message)
@@ -97,6 +104,11 @@ for (let i = 0; i < max; i++) {
 
     if (pulse.value === false) lows++
     if (pulse.value === true) highs++
+
+    if (pulse.target.name === "rx" && pulse.value === false) {
+      console.log("Part 2 is...", i + 1)
+      break
+    }
     
     debug(`Processing pulse from [${pulse.from}] -[${pulse.value}] to [${pulse.target.name}]`)
 
@@ -125,6 +137,10 @@ for (let i = 0; i < max; i++) {
         break
     }
   }
+
+  console.log(
+    modules.map(m => m.signal ? "#" : " ").join("")
+  )
 }
 
 const part1 = lows * highs
