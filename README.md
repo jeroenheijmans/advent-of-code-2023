@@ -37,7 +37,7 @@ Here's what I learned (or noticed) each day.
 17. Path finding algorithms can be hard.
 18. Knowing how to do something !== Being able to to do something
 19. Sometimes you've got to work your way backwards?
-20. TODO
+20. MermaidJS is great!
 21. TODO
 22. TODO
 23. TODO
