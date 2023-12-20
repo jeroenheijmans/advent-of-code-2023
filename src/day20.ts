@@ -20,13 +20,16 @@ broadcaster -> a
 
 input = Deno.readTextFileSync("./src/inputs/day20.txt")
 
+type ModuleType = "flip"|"conj"|"norm"|"output"
+
 interface Module {
-  type: string,
+  type: ModuleType,
   name: string,
   targets: Module[],
   targetKeys: string[],
   signal: boolean,
   memories: Record<string, boolean>,
+  depth: number,
 }
 
 const modules = input
@@ -35,12 +38,13 @@ const modules = input
   .filter(x => x)
   .map(line => line.split(" -> "))
   .map(([module, targets]) => ({
-    type: module.startsWith("%") ? "flip" : module.startsWith("&") ? "conjunction" : "normal",
+    type: module.startsWith("%") ? "flip" : module.startsWith("&") ? "conj" : "norm",
     name: module.replace("%", "").replace("&", ""),
     targets: [],
     targetKeys: targets.split(", "),
     signal: false,
     memories: {},
+    depth: 0,
   } as Module))
   // .toSorted((a, b) => a.name.localeCompare(b.name))
   .toSorted((a, b) => {
@@ -57,12 +61,13 @@ const lookup = modules.reduce((result, next) => {
 const outputNames = new Set(modules.map(m => m.targetKeys).flat().filter(key => !lookup[key]))
 for (const name of outputNames) {
   const module = {
-    type: "untyped",
+    type: "output" as ModuleType,
     name,
     targets: [],
     targetKeys: [],
     signal: false,
     memories: {},
+    depth: 0,
   }
   modules.push(module)
   lookup[name] = module
@@ -71,7 +76,7 @@ const outputModules = [...outputNames].toSorted().map(k => lookup[k])
 
 modules.forEach(m => m.targets = m.targetKeys.map(key => lookup[key]))
 modules
-  .filter(m => m.type === "conjunction")
+  .filter(m => m.type === "conj")
   .forEach(m => m.memories = modules
       .filter(other => other.targetKeys.includes(m.name))
       .reduce((result, next) => {
@@ -79,13 +84,49 @@ modules
         return result
       }, {} as Record<string, boolean>))
 
+// Sort for console logging
+const visited = new Set<string>()
+function setDepthFor(module: Module, depth = 0) {
+  module.depth = Math.max(module.depth, depth)
+  if (visited.has(module.name)) return
+  visited.add(module.name)
+  module.targets.forEach(t => setDepthFor(t, depth + 1))
+}
+setDepthFor(lookup["broadcaster"])
+const sortIndexes = {"norm": 0, "flip": 1, "conj": 2, "output": 3}
+modules.sort((a, b) => {
+  if (a.type !== b.type) return sortIndexes[a.type] - sortIndexes[b.type]
+  if (a.depth !== b.depth) a.depth - b.depth
+  return a.name.localeCompare(b.name)
+})
+
+// Output for mermaid diagrams:
+console.log("%% ---------------------------------------------")
+console.log("%% Paste to: https://mermaid.live/")
+console.log("flowchart TD")
+modules.forEach(m => {
+  let line = `    `
+  if (m.type === "flip") line += `${m.name}{${m.name}}:::${m.type}-.->`
+  else if (m.type === "conj") line += `${m.name}[[${m.name}]]:::${m.type}-->`
+  else if (m.type === "norm") line += `${m.name}:::${m.type}==>`
+  else line += `${m.name}:::${m.type}`
+  line += m.targets.map(t => t.name).join(" & ")
+  console.log(line)
+})
+console.log("    classDef flip fill:#f96")
+console.log("    classDef conj fill:#9fa")
+console.log("    classDef norm fill:#9af")
+console.log("    classDef output fill:#333,color:#ffc")
+console.log("%% ---------------------------------------------")
+console.log()
+
 interface Pulse {
   from: string,
   target: Module
   value: boolean,
 }
 
-const max = 1e3
+const max = 1e9
 const broadcaster = lookup["broadcaster"]
 const debug = max < 5
   ? (message: string) => console.log(message)
@@ -116,7 +157,7 @@ for (let i = 0; i < max; i++) {
     const from = module.name
 
     switch (module.type) {
-      case "normal":
+      case "norm":
         module.targets.forEach(target => pulses.push({ from, target, value: pulse.value }))
         break
       case "flip":
@@ -125,22 +166,29 @@ for (let i = 0; i < max; i++) {
           module.targets.forEach(target => pulses.push({ from, target, value: module.signal }))
         }
         break
-      case "conjunction":
+      case "conj":
         {
           module.memories[pulse.from] = pulse.value
           const value = !Object.values(module.memories).every(v => v)
           module.targets.forEach(target => pulses.push({ from, target, value }))
         }
         break
-      case "untyped":
+      case "output":
       default:
         break
     }
   }
 
-  console.log(
-    modules.map(m => m.signal ? "#" : " ").join("")
-  )
+  // if (i % 1e4 === 0)
+    console.log(
+      Object.values(
+        Object.groupBy(
+          modules.filter(m => m.type !== "conj"),
+          ({depth}) => depth,
+        )
+      )
+        .map(group => group.map(m => m.signal ? "#" : ".").toSorted().join("")).join("  ")
+    )
 }
 
 const part1 = lows * highs
