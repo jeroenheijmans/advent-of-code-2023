@@ -21,43 +21,61 @@ hdj{m>838:A,pv}
 {x=2127,m=1623,a=2188,s=1013}
 `
 
-input = Deno.readTextFileSync("./src/inputs/day19.txt")
+// input = Deno.readTextFileSync("./src/inputs/day19.txt")
 
-const [rulesData, partsData] = input
+interface Rule {
+  key?: string
+  sign?: string
+  value?: number
+  target: string
+}
+
+interface Workflow {
+  name: string
+  rules: Rule[]
+}
+
+const [workflowsData, partsData] = input
   .trim()
   .split(/\r?\n\r?\n/)
   .map(section => section.split(/\r?\n/))
 
-const rules = rulesData
-  .map(line => line.replaceAll("}", ""))
+const workflows = workflowsData
   .map(line => ({
     name: line.split("{")[0],
     rules: line
+      .replaceAll("}", "")
       .split("{")[1]
       .split(",")
-      .map(r => r.includes(":") ? ({
-        key: r[0],
-        sign: r[1],
-        value: parseInt(r.substring(2, r.indexOf(":"))),
-        target: r.substring(r.indexOf(":") + 1)
-      }) : r),
+      .map(r => r.includes(":")
+        // Rule with comparison:
+        ? {
+          key: r[0],
+          sign: r[1],
+          value: parseInt(r.substring(2, r.indexOf(":"))),
+          target: r.substring(r.indexOf(":") + 1),
+        }
+        // Fallback rule with only a target:
+        : {
+          target: r,
+        }
+      ),
   }))
 
-const lookup = rules.reduce((result, rule) => {
+const lookup = workflows.reduce((result, rule) => {
   result[rule.name] = rule
   return result
-}, {} as any)
+}, {} as Record<string, Workflow>)
 
-type PartKey = "x"|"m"|"a"|"s"
-type Part = Record<PartKey, number>
+type Part = Record<string, number>
 
-let parts = partsData
+const parts = partsData
   .map(line => line
     .replaceAll(/[{}]/g, "")
     .split(",")
     .map(x => x.split("="))
     .reduce((result, next) => {
-      result[next[0] as PartKey] = parseInt(next[1])
+      result[next[0]] = parseInt(next[1])
       return result
     }, {} as Part)
   )
@@ -66,20 +84,16 @@ let part1 = 0
 
 parts.forEach(part => {
   let location = "in"
-  // console.log("Part", part, "at", location)
   while (location !== "A" && location !== "R") {
-    // console.log("At", location)
-    const workflow = lookup[location]
-    for (const rule of workflow.rules) {
-      if (isString(rule)) {
-        location = rule
+    for (const rule of lookup[location].rules) {
+      if (!rule.key || !rule.value) {
+        location = rule.target
       } else {
         const value = part[rule.key]
         if (rule.sign === "<" && value < rule.value) { location = rule.target; break; }
         if (rule.sign === ">" && value > rule.value) { location = rule.target ; break; }
       }
     }
-    
   }
   if (location === "A") {
     part1 += part.x + part.m + part.a + part.s
