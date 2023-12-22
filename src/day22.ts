@@ -1,4 +1,4 @@
-import {startDay, finishDay, Vector3} from './util.ts'
+import {startDay, finishDay, Vector3, add} from './util.ts'
 startDay(22)
 
 let input = `
@@ -60,8 +60,6 @@ while (!settled) {
   })
 }
 
-// console.log(bricks)
-
 function couldBeDisintigrated(brick: Vector3[]) {
   return bricks.every(other => {
     if (other === brick) return true // it's me!
@@ -70,11 +68,39 @@ function couldBeDisintigrated(brick: Vector3[]) {
   })
 }
 
+console.log("Calculating part 1 might take a while...")
 const part1 = bricks
   .filter(b => couldBeDisintigrated(b))
   .length
 
-const part2 = 0
+console.log("Calculating part 2 will be even slower, be patient please...")
+const part2 = bricks
+  .map((_brickToBeDisintigrated, index) => {
+    // console.log("Considering brick at input line", index + 1)
+    const bricksClone = (JSON.parse(JSON.stringify(bricks)) as Vector3[][])
+    bricksClone.splice(index, 1)
+    const hasMoved = new Set<Vector3[]>()
+
+    let settled = false
+    while (!settled) {
+      settled = true
+
+      if (hasMoved.size === bricksClone.length) break // further falling not important for part 2
+
+      bricksClone.forEach(brick => {
+        if (brick.some(c => c.z === 1)) return
+    
+        if (!bricksClone.some(b => b !== brick && isSupporting(b, brick))) {
+          hasMoved.add(brick)
+          brick.forEach(c => c.z--)
+          settled = false
+        }
+      })
+    }
+
+    return hasMoved.size
+  })
+  .reduce(add, 0)
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
