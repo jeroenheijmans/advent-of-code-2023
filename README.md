@@ -39,7 +39,7 @@ Here's what I learned (or noticed) each day.
 19. Sometimes you've got to work your way backwards?
 20. MermaidJS is great!
 21. TODO
-22. TODO
+22. Slow can be fine.
 23. TODO
 24. TODO
 25. TODO
