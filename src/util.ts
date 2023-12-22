@@ -30,6 +30,10 @@ export interface Vector2 {
   y: number;
 }
 
+export interface Vector3 extends Vector2 {
+  z: number;
+}
+
 export function add(a: number, b: number) {
   return a + b;
 }
