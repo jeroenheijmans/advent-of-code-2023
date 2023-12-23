@@ -27,18 +27,25 @@ let input = `
 #####################.#
 `
 
-input = Deno.readTextFileSync("./src/inputs/day23.txt")
+// input = Deno.readTextFileSync("./src/inputs/day23.txt")
+
+interface Jump {
+  target: Location
+  distance: number
+}
 
 interface Location extends Vector2 {
   key: string
   char: string
   targets: Location[]
   connected: Location[]
+  jumps: Jump[]
 }
 
 interface Path extends Array<Location> {
   isFinished?: boolean
   isFull?: boolean
+  distance: number
 }
 
 function drawPath(path: Path) {
@@ -57,7 +64,13 @@ const locations = input
   .filter(x => x)
   .map((line, y) => line.split("").map((char, x) => ({x,y,char})))
   .flat()
-  .map(loc => ({ ...loc, key: `${loc.x};${loc.y}`, targets: [] as Location[], connected: [] as Location[]  }))
+  .map(loc => ({
+    ...loc,
+    key: `${loc.x};${loc.y}`,
+    targets: [] as Location[],
+    connected: [] as Location[],
+    jumps: [] as Jump[],
+  }))
   .filter(loc => loc.char !== "#")
 
 const maxx = Math.max(...locations.map(l => l.x)) + 1
@@ -99,37 +112,87 @@ locations.forEach(loc => {
   }
 })
 
-let paths = [[lookup["1;0"]]] as Path[]
-
-while (paths.some(p => !p.isFinished)) {
-  const newPaths = [] as Path[]
-
-  paths
-    .filter(p => !p.isFinished)
-    .forEach(path => {
-      const last = path[path.length - 1]
-      const options = last.targets.filter(t => !path.includes(t))
-      if (options.length > 0) {
-        options.forEach(option => newPaths.push([...path, option]))
-      } else {
-        path.isFinished = true
-        path.isFull = last.y === maxy
-        newPaths.push(path)
-      }
-    })
-  
-  paths = newPaths.concat(paths.filter(p => p.isFinished))
+function findNextJunctionFrom(target: Location, previous: Location): Jump {
+  if (target.connected.length !== 2) return { target, distance: 1 }
+  const jump = findNextJunctionFrom(target.connected.filter(c => c !== previous)[0], target)
+  return { target: jump.target, distance: jump.distance + 1 }
 }
 
-const hikes = paths.filter(p => p.isFull)
-const longest = hikes.toSorted((a,b) => b.length - a.length).at(0)!
+locations
+  .filter(loc => loc.connected.length !== 2)
+  .forEach(location => {
+    location.jumps = location.connected.map(x => findNextJunctionFrom(x, location))
+  })
 
-// drawPath(longest)
 
-const part1 = longest.length - 1
-const part2 = 0
+{
+  let paths = [[lookup["1;0"]]] as Path[]
+  paths[0].distance = 0
 
-console.log("Part 1:", part1)
-console.log("Part 2:", part2)
+  while (paths.some(p => !p.isFinished)) {
+    const newPaths = [] as Path[]
+
+    paths
+      .filter(p => !p.isFinished)
+      .forEach(path => {
+        const last = path[path.length - 1]
+        const options = last.targets.filter(t => !path.includes(t))
+        if (options.length > 0) {
+          options.forEach(option => {
+            const newPath = [...path, option] as Path
+            newPath.distance = path.distance + 1
+            newPaths.push(newPath)
+          })
+        } else {
+          path.isFinished = true
+          path.isFull = last.y === maxy
+          newPaths.push(path)
+        }
+      })
+    
+    paths = newPaths.concat(paths.filter(p => p.isFinished))
+  }
+
+  const hikes = paths.filter(p => p.isFull)
+  const longest = hikes.toSorted((a,b) => b.length - a.length).at(0)!
+  const part1 = longest.length - 1
+  // drawPath(longest)
+  console.log("Part 1:", part1)
+}
+
+{
+  let paths = [[lookup["1;0"]]] as Path[]
+  paths[0].distance = 0
+
+  while (paths.some(p => !p.isFinished)) {
+    const newPaths = [] as Path[]
+
+    paths
+      .filter(p => !p.isFinished)
+      .forEach(path => {
+        const last = path[path.length - 1]
+        const options = last.jumps.filter(jump => !path.includes(jump.target))
+        if (options.length > 0) {
+          options.forEach(option => {
+            const newPath = [...path, option.target] as Path
+            newPath.distance = path.distance + option.distance
+            newPaths.push(newPath)
+          })
+        } else {
+          path.isFinished = true
+          path.isFull = last.y === maxy
+          newPaths.push(path)
+        }
+      })
+    
+    paths = newPaths.concat(paths.filter(p => p.isFinished))
+  }
+
+  const hikes = paths.filter(p => p.isFull)
+  const longest = hikes.toSorted((a,b) => b.distance - a.distance).at(0)!
+  const part2 = longest.distance
+  drawPath(longest)
+  console.log("Part 2:", part2)
+}
 
 finishDay()
