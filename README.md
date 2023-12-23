@@ -40,7 +40,7 @@ Here's what I learned (or noticed) each day.
 20. MermaidJS is great!
 21. Know when to take a break.
 22. Slow can be fine.
-23. TODO
+23. Reinventing algorithms on your own is dumb _and_ smart.
 24. TODO
 25. TODO
 
