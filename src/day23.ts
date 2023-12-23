@@ -33,6 +33,22 @@ interface Location extends Vector2 {
   key: string
   char: string
   targets: Location[]
+  connected: Location[]
+}
+
+interface Path extends Array<Location> {
+  isFinished?: boolean
+  isFull?: boolean
+}
+
+function drawPath(path: Path) {
+  for (let y = 0; y <= maxy; y++) {
+    let line = ""
+    for (let x = 0; x <= maxx; x++) {
+      line += path.find(loc => loc.x === x && loc.y === y) ? "O" : (lookup[`${x};${y}`]?.char || "#")
+    }
+    console.log(line)
+  }
 }
 
 const locations = input
@@ -41,7 +57,7 @@ const locations = input
   .filter(x => x)
   .map((line, y) => line.split("").map((char, x) => ({x,y,char})))
   .flat()
-  .map(loc => ({ ...loc, key: `${loc.x};${loc.y}`, targets: [] as Location[] }))
+  .map(loc => ({ ...loc, key: `${loc.x};${loc.y}`, targets: [] as Location[], connected: [] as Location[]  }))
   .filter(loc => loc.char !== "#")
 
 const maxx = Math.max(...locations.map(l => l.x)) + 1
@@ -54,6 +70,11 @@ const lookup = locations
   }, {} as Record<string, Location>)
 
 locations.forEach(loc => {
+  if (lookup[`${loc.x - 1};${loc.y + 0}`]) loc.connected.push(lookup[`${loc.x - 1};${loc.y + 0}`])
+  if (lookup[`${loc.x + 1};${loc.y + 0}`]) loc.connected.push(lookup[`${loc.x + 1};${loc.y + 0}`])
+  if (lookup[`${loc.x + 0};${loc.y - 1}`]) loc.connected.push(lookup[`${loc.x + 0};${loc.y - 1}`])
+  if (lookup[`${loc.x + 0};${loc.y + 1}`]) loc.connected.push(lookup[`${loc.x + 0};${loc.y + 1}`])
+
   switch (loc.char) {
     case ">":
       loc.targets.push(lookup[`${loc.x + 1};${loc.y + 0}`])
@@ -76,20 +97,11 @@ locations.forEach(loc => {
     default:
       throw "Unexpected location: " + loc.key
   }
-  
 })
 
-const start = lookup["1;0"]
+let paths = [[lookup["1;0"]]] as Path[]
 
-interface Path extends Array<Location> {
-  isFinished?: boolean
-  isFull?: boolean
-}
-
-let paths = [[start]] as Path[]
-
-let i = 0
-while (i ++ < 1e7 && paths.some(p => !p.isFinished)) {
+while (paths.some(p => !p.isFinished)) {
   const newPaths = [] as Path[]
 
   paths
@@ -110,19 +122,11 @@ while (i ++ < 1e7 && paths.some(p => !p.isFinished)) {
 }
 
 const hikes = paths.filter(p => p.isFull)
+const longest = hikes.toSorted((a,b) => b.length - a.length).at(0)!
 
-if (i >= 1e7) console.log("Exited loop unexpectedly at max step", i)
+// drawPath(longest)
 
-const path = hikes.toSorted((a,b) => a.length - b.length).at(0)!
-for (let y = 0; y <= maxy; y++) {
-  let line = ""
-  for (let x = 0; x <= maxx; x++) {
-    line += path.find(loc => loc.x === x && loc.y === y) ? "O" : (lookup[`${x};${y}`]?.char || "#")
-  }
-  // console.log(line)
-}
-
-const part1 = Math.max(...hikes.map(p => p.length - 1))
+const part1 = longest.length - 1
 const part2 = 0
 
 console.log("Part 1:", part1)
