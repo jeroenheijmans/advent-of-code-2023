@@ -27,8 +27,7 @@ let input = `
 #####################.#
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day23.txt")
-input = await Bun.file("./src/inputs/day23.txt").text()
+input = Deno.readTextFileSync("./src/inputs/day23.txt")
 
 interface Jump {
   target: Location
@@ -158,39 +157,49 @@ locations
   console.log("Part 1:", part1)
 }
 
-{
-  let paths = [[lookup["1;0"]]] as Path[]
-  paths[0].distance = 0
+console.log(`TODO: Fix part 2.
+We 'solved' part 2 by running the inefficient algorithm
+with Bun, which allows for a lot more memory usage and 
+won't crash on the real input like Deno does.
 
-  while (paths.some(p => !p.isFinished)) {
-    const newPaths = [] as Path[]
+For now we disable part 2. If you want to run this script
+anyways (or with Bun) uncomment the relevant lines below.`)
 
-    paths
-      .filter(p => !p.isFinished)
-      .forEach(path => {
-        const last = path[path.length - 1]
-        const options = last.jumps.filter(jump => !path.includes(jump.target))
-        if (options.length > 0) {
-          options.forEach(option => {
-            const newPath = [...path, option.target] as Path
-            newPath.distance = path.distance + option.distance
-            newPaths.push(newPath)
-          })
-        } else {
-          path.isFinished = true
-          path.isFull = last.y === maxy
-          newPaths.push(path)
-        }
-      })
+// input = await Bun.file("./src/inputs/day23.txt").text()
+
+// {
+//   let paths = [[lookup["1;0"]]] as Path[]
+//   paths[0].distance = 0
+
+//   while (paths.some(p => !p.isFinished)) {
+//     const newPaths = [] as Path[]
+
+//     paths
+//       .filter(p => !p.isFinished)
+//       .forEach(path => {
+//         const last = path[path.length - 1]
+//         const options = last.jumps.filter(jump => !path.includes(jump.target))
+//         if (options.length > 0) {
+//           options.forEach(option => {
+//             const newPath = [...path, option.target] as Path
+//             newPath.distance = path.distance + option.distance
+//             newPaths.push(newPath)
+//           })
+//         } else {
+//           path.isFinished = true
+//           path.isFull = last.y === maxy
+//           newPaths.push(path)
+//         }
+//       })
     
-    paths = newPaths.concat(paths.filter(p => p.isFinished))
-  }
+//     paths = newPaths.concat(paths.filter(p => p.isFinished))
+//   }
 
-  const hikes = paths.filter(p => p.isFull)
-  const longest = hikes.toSorted((a,b) => b.distance - a.distance).at(0)!
-  const part2 = longest.distance
-  drawPath(longest)
-  console.log("Part 2:", part2)
-}
+//   const hikes = paths.filter(p => p.isFull)
+//   const longest = hikes.toSorted((a,b) => b.distance - a.distance).at(0)!
+//   const part2 = longest.distance
+//   drawPath(longest)
+//   console.log("Part 2:", part2)
+// }
 
 finishDay()
