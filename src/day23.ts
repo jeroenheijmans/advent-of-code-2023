@@ -1,4 +1,4 @@
-import {startDay, finishDay, Vector2, drawGrid} from './util.ts'
+import {startDay, finishDay, Vector2} from './util.ts'
 startDay(23)
 
 let input = `
@@ -28,6 +28,7 @@ let input = `
 `
 
 // input = Deno.readTextFileSync("./src/inputs/day23.txt")
+input = await Bun.file("./src/inputs/day23.txt").text()
 
 interface Jump {
   target: Location
@@ -120,10 +121,7 @@ function findNextJunctionFrom(target: Location, previous: Location): Jump {
 
 locations
   .filter(loc => loc.connected.length !== 2)
-  .forEach(location => {
-    location.jumps = location.connected.map(x => findNextJunctionFrom(x, location))
-  })
-
+  .forEach(location => location.jumps = location.connected.map(x => findNextJunctionFrom(x, location)))
 
 {
   let paths = [[lookup["1;0"]]] as Path[]
