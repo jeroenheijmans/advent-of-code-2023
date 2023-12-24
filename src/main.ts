@@ -21,5 +21,5 @@
 // import './day21.ts';
 // import './day22.ts';
 // import './day23.ts';
-import './day24.ts';
-// import './day25.ts';
+// import './day24.ts';
+import './day25.ts';
