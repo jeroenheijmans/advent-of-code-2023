@@ -41,7 +41,7 @@ Here's what I learned (or noticed) each day.
 21. Know when to take a break.
 22. Slow can be fine.
 23. Reinventing algorithms on your own is dumb _and_ smart.
-24. TODO
+24. Math is hard.
 25. TODO
 
 ## Compendium Repositories
