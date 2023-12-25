@@ -23,16 +23,19 @@ hdj{m>838:A,pv}
 
 input = Deno.readTextFileSync("./src/inputs/day19.txt")
 
-interface Rule {
+interface Targetable {
+  target: string
+}
+
+interface Rule extends Targetable {
   key?: "x"|"m"|"a"|"s"
   sign?: string
   value?: number
-  target: string
 }
 
 interface Workflow {
   name: string
-  rules: Rule[]
+  rules: (Targetable|Rule)[]
 }
 
 const [workflowsData, partsData] = input
@@ -40,7 +43,7 @@ const [workflowsData, partsData] = input
   .split(/\r?\n\r?\n/)
   .map(section => section.split(/\r?\n/))
 
-const workflows = workflowsData
+const workflows: Workflow[] = workflowsData
   .map(line => ({
     name: line.split("{")[0],
     rules: line
@@ -48,22 +51,20 @@ const workflows = workflowsData
       .split("{")[1]
       .split(",")
       .map(r => r.includes(":")
-        // Rule with comparison:
         ? {
           key: r[0],
           sign: r[1],
           value: parseInt(r.substring(2, r.indexOf(":"))),
           target: r.substring(r.indexOf(":") + 1),
         }
-        // Fallback rule with only a target:
         : {
           target: r,
         }
       ),
   }))
 
-const lookup = workflows.reduce((result, rule) => {
-  result[rule.name] = rule
+const workflowLookup = workflows.reduce((result, wf) => {
+  result[wf.name] = wf
   return result
 }, {} as Record<string, Workflow>)
 
@@ -85,7 +86,7 @@ let part1 = 0
 parts.forEach(part => {
   let location = "in"
   while (location !== "A" && location !== "R") {
-    for (const rule of lookup[location].rules) {
+    for (const rule of workflowLookup[location].rules) {
       if (!rule.key || !rule.value) {
         location = rule.target
       } else {
@@ -132,7 +133,7 @@ while (current.length > 0) {
       return
     }
 
-    const wf = lookup[xmas.location]!
+    const wf = workflowLookup[xmas.location]!
 
     for (const rule of wf.rules) {
       if (!rule.key || !rule.value) {
@@ -160,7 +161,6 @@ while (current.length > 0) {
         newList.push(xmasClone)
       }
     }
-
   })
 
   current = newList
