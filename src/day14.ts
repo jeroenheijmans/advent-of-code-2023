@@ -66,6 +66,8 @@ function part1() {
   console.log("Part 1:", part1)
 }
 
+console.log("Warning: unoptimized part 2 calculation might take dozens of seconds.")
+
 function part2() {
   const rocks: Point[] = []
   const walls: Point[] = []

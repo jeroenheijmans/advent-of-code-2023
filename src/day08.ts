@@ -1,6 +1,7 @@
 import {startDay, finishDay} from './util.ts'
 startDay(8)
 
+let startPart2At = 1
 let input = `
 LR
 
@@ -14,7 +15,7 @@ LR
 XXX = (XXX, XXX)
 `
 
-input = Deno.readTextFileSync("./src/inputs/day08.txt")
+input = Deno.readTextFileSync("./src/inputs/day08.txt"); startPart2At = 1e13; // educated guess
 
 const data = input
   .trim()
@@ -59,9 +60,7 @@ const items = Object.values(nodes)
   .map(node => {
     let current = node
     let i = 0, step = 0
-    while (true) {
-      // if (current.isPart2EndNode) console.log("Encountered end", current.key, ` at step = ${step}`)
-      if (current.isPart2EndNode) break
+    while (!current.isPart2EndNode) {
       const turn = nav[i++]
       i %= nav.length
       current = nodes[current[turn]]
@@ -70,14 +69,12 @@ const items = Object.values(nodes)
     return step
   })
 
-// console.log("Lengths:", items.toSorted())
-
 const [item1, ...rest] = items.toSorted().toReversed()
 
 console.log("Warning: unoptimized calculation might take dozens of seconds.")
 
 let part2 = 1
-let j = 1
+let j = Math.trunc(startPart2At / item1)
 while (true) {
   part2 = item1 * j++
   if (rest.every(i => part2 % i === 0)) break

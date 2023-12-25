@@ -12,7 +12,7 @@ let input = `
 
 // input = '????.#...#... 4,1,1'
 // input = '????.######..#####. 1,6,5'
-// input = Deno.readTextFileSync("./src/inputs/day12.txt")
+input = Deno.readTextFileSync("./src/inputs/day12.txt")
 
 const data = input
   .replaceAll(/(\.\.)+/g, ".")
@@ -98,20 +98,20 @@ function getArrangements(input: string, nrs: number[]) {
 
 const part1 = data
   .map(({line, nrs}, index) => {
-    const started = new Date().getTime()
+    // const started = new Date().getTime()
     const result = getArrangements(
       line.replaceAll(/\.\./g, '.'),
       nrs,
     )
-    const ended = new Date().getTime()
-    console.log(`Line ${index + 1} ran in ${ended - started}ms`)
+    // const ended = new Date().getTime()
+    // console.log(`Line ${index + 1} ran in ${ended - started}ms`)
     return result
   })
   .reduce(add, 0)
 
 console.log("Part 1:", part1)
 
-const part2 = data
+const part2 = 0 /* data
   .map(({line, nrs}, index) => {
     const started = new Date().getTime()
     const result = getArrangements(
@@ -122,7 +122,8 @@ const part2 = data
     console.log(`Line ${index + 1} ran in ${ended - started}ms`)
     return result
   })
-  .reduce(add, 0)
+  .reduce(add, 0)*/
+
 console.log("Part 2:", part2)
 
 finishDay()

@@ -33,7 +33,6 @@ L 9 (#000000)
 U 9 (#000000)
 `
 
-
 // input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
@@ -165,27 +164,27 @@ const verticalBorders = borders
 
 let part2 = 0
 
-for (let x = minx; x <= maxx; x++) {
-  const relevantHorizontalBorders = horizontalBorders.filter(b => x >= b.from.x && x <= b.to.x)
-  const relevantVerticalBorders = verticalBorders.filter(b => b.from.x === x)
+// for (let x = minx; x <= maxx; x++) {
+//   const relevantHorizontalBorders = horizontalBorders.filter(b => x >= b.from.x && x <= b.to.x)
+//   const relevantVerticalBorders = verticalBorders.filter(b => b.from.x === x)
 
-  let columnTotal = 0
-  let nextHorizontalBorder = relevantHorizontalBorders.shift()
-  let y = nextHorizontalBorder!.from.y
-  let isInside = true
-  const boty = relevantHorizontalBorders[relevantHorizontalBorders.length - 1].to.y
+//   let columnTotal = 0
+//   let nextHorizontalBorder = relevantHorizontalBorders.shift()
+//   let y = nextHorizontalBorder!.from.y
+//   let isInside = true
+//   const boty = relevantHorizontalBorders[relevantHorizontalBorders.length - 1].to.y
 
-  while (y < boty) {
-    nextHorizontalBorder = relevantHorizontalBorders.shift()
-    const nexty = nextHorizontalBorder!.from.y
-    if (isInside) columnTotal += nexty - y
-    isInside = !isInside
-    y = nexty
-  }
+//   while (y < boty) {
+//     nextHorizontalBorder = relevantHorizontalBorders.shift()
+//     const nexty = nextHorizontalBorder!.from.y
+//     if (isInside) columnTotal += nexty - y
+//     isInside = !isInside
+//     y = nexty
+//   }
 
-  console.log(x, " = ", columnTotal)
-  part2 += columnTotal + relevantVerticalBorders.map(b => b.to.y - b.from.y).reduce(add, 0)
-}
+//   console.log(x, " = ", columnTotal)
+//   part2 += columnTotal + relevantVerticalBorders.map(b => b.to.y - b.from.y).reduce(add, 0)
+// }
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)

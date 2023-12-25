@@ -72,7 +72,7 @@ for (const name of outputNames) {
   modules.push(module)
   lookup[name] = module
 }
-const outputModules = [...outputNames].toSorted().map(k => lookup[k])
+// const outputModules = [...outputNames].toSorted().map(k => lookup[k])
 
 modules.forEach(m => m.targets = m.targetKeys.map(key => lookup[key]))
 modules
@@ -101,24 +101,24 @@ modules.sort((a, b) => {
 })
 
 // Output for mermaid diagrams:
-console.log("%% ---------------------------------------------")
-console.log("%% Paste to: https://mermaid.live/")
-console.log("flowchart TD")
-modules.forEach(m => {
-  let line = `    `
-  if (m.type === "flip") line += `${m.name}{${m.name}}:::${m.type}-.->`
-  else if (m.type === "conj") line += `${m.name}[[${m.name}]]:::${m.type}-->`
-  else if (m.type === "norm") line += `${m.name}:::${m.type}==>`
-  else line += `${m.name}:::${m.type}`
-  line += m.targets.map(t => t.name).join(" & ")
-  console.log(line)
-})
-console.log("    classDef flip fill:#f96")
-console.log("    classDef conj fill:#9fa")
-console.log("    classDef norm fill:#9af")
-console.log("    classDef output fill:#333,color:#ffc")
-console.log("%% ---------------------------------------------")
-console.log()
+// console.log("%% ---------------------------------------------")
+// console.log("%% Paste to: https://mermaid.live/")
+// console.log("flowchart TD")
+// modules.forEach(m => {
+//   let line = `    `
+//   if (m.type === "flip") line += `${m.name}{${m.name}}:::${m.type}-.->`
+//   else if (m.type === "conj") line += `${m.name}[[${m.name}]]:::${m.type}-->`
+//   else if (m.type === "norm") line += `${m.name}:::${m.type}==>`
+//   else line += `${m.name}:::${m.type}`
+//   line += m.targets.map(t => t.name).join(" & ")
+//   console.log(line)
+// })
+// console.log("    classDef flip fill:#f96")
+// console.log("    classDef conj fill:#9fa")
+// console.log("    classDef norm fill:#9af")
+// console.log("    classDef output fill:#333,color:#ffc")
+// console.log("%% ---------------------------------------------")
+// console.log()
 
 interface Pulse {
   from: string,
@@ -126,7 +126,7 @@ interface Pulse {
   value: boolean,
 }
 
-const max = 1e9
+const max = 1e4
 const broadcaster = lookup["broadcaster"]
 const debug = max < 5
   ? (message: string) => console.log(message)
@@ -180,15 +180,15 @@ for (let i = 0; i < max; i++) {
   }
 
   // if (i % 1e4 === 0)
-    console.log(
-      Object.values(
-        Object.groupBy(
-          modules.filter(m => m.type !== "conj"),
-          ({depth}) => depth,
-        )
-      )
-        .map(group => group.map(m => m.signal ? "#" : ".").toSorted().join("")).join("  ")
-    )
+    // console.log(
+    //   Object.values(
+    //     Object.groupBy(
+    //       modules.filter(m => m.type !== "conj"),
+    //       ({depth}) => depth,
+    //     )
+    //   )
+    //     .map(group => group.map(m => m.signal ? "#" : ".").toSorted().join("")).join("  ")
+    // )
 }
 
 const part1 = lows * highs

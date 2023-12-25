@@ -103,7 +103,7 @@ function draw() {
   }
 }
 
-draw()
+// draw()
 
 const part2 = options.length
 console.log("Part 2:", part2)
