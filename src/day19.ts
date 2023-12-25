@@ -1,4 +1,4 @@
-import {startDay, finishDay, isString} from './util.ts'
+import {startDay, finishDay, isString, add} from './util.ts'
 startDay(19)
 
 let input = `
@@ -21,10 +21,10 @@ hdj{m>838:A,pv}
 {x=2127,m=1623,a=2188,s=1013}
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day19.txt")
+input = Deno.readTextFileSync("./src/inputs/day19.txt")
 
 interface Rule {
-  key?: string
+  key?: "x"|"m"|"a"|"s"
   sign?: string
   value?: number
   target: string
@@ -100,7 +100,75 @@ parts.forEach(part => {
   }
 })
 
-const part2 = 0 // [rules, parts]
+interface Xmas {
+  location: string
+  x: number[]
+  m: number[]
+  a: number[]
+  s: number[]
+}
+
+const start: Xmas = {
+  location: "in",
+  x: [...Array(4000).keys()].map(i => i + 1),
+  m: [...Array(4000).keys()].map(i => i + 1),
+  a: [...Array(4000).keys()].map(i => i + 1),
+  s: [...Array(4000).keys()].map(i => i + 1),
+}
+
+const accepted: Xmas[] = []
+let current = [start]
+
+while (current.length > 0) {
+  const newList: Xmas[] = []
+
+  current.forEach(xmas => {
+    if (xmas.location === "A") {
+      accepted.push(xmas)
+      return
+    }
+
+    if (xmas.location === "R") {
+      return
+    }
+
+    const wf = lookup[xmas.location]!
+
+    for (const rule of wf.rules) {
+      if (!rule.key || !rule.value) {
+        xmas.location = rule.target
+        newList.push(xmas)
+      } else {
+        const xmasClone = {
+          location: rule.target,
+          x: [...xmas.x],
+          m: [...xmas.m],
+          a: [...xmas.a],
+          s: [...xmas.s],
+        }
+
+        if (rule.sign === "<") {
+          xmasClone[rule.key] = xmas[rule.key].filter(n => n < rule.value)
+          xmas[rule.key] = xmas[rule.key].filter(n => n >= rule.value)
+        }
+        else
+        if (rule.sign === ">") {
+          xmasClone[rule.key] = xmas[rule.key].filter(n => n > rule.value)
+          xmas[rule.key] = xmas[rule.key].filter(n => n <= rule.value)
+        }
+
+        newList.push(xmasClone)
+      }
+    }
+
+  })
+
+  current = newList
+}
+
+const part2 = accepted
+  .map(xmas => xmas.x.length * xmas.m.length * xmas.a.length * xmas.s.length)
+  .reduce(add, 0)
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
