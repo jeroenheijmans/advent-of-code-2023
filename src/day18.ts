@@ -1,4 +1,4 @@
-import {startDay, finishDay, Vector2, add} from './util.ts'
+import {startDay, finishDay, Vector2} from './util.ts'
 startDay(18)
 
 let input = `
@@ -18,22 +18,7 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
-input = `
-R 2 (#000000)
-D 2 (#000000)
-R 3 (#000000)
-U 2 (#000000)
-R 4 (#000000)
-D 4 (#000000)
-L 3 (#000000)
-D 3 (#000000)
-R 3 (#000000)
-D 3 (#000000)
-L 9 (#000000)
-U 9 (#000000)
-`
-
-// input = Deno.readTextFileSync("./src/inputs/day18.txt")
+input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
   .trim()
@@ -54,25 +39,6 @@ const instructionsPart1 = raw
 let location = {x:0, y:0}
 const lookup = { "0;0": location } as Record<string, {x:number, y:number}>
 const visited = new Set<string>()
-const debuglocs = new Set<string>()
-
-function draw() {
-  const maxx = Math.max(...[...Object.values(lookup)].map(n => n.x)) + 1
-  const maxy = Math.max(...[...Object.values(lookup)].map(n => n.y)) + 1
-  const minx = Math.min(...[...Object.values(lookup)].map(n => n.x)) + 1
-  const miny = Math.min(...[...Object.values(lookup)].map(n => n.y)) + 1
-  for (let y = miny - 1; y < maxy; y++) {
-    let line = ""
-    for (let x = minx - 1; x < maxx; x++) {
-      const key = `${x};${y}`
-      if (debuglocs.has(key))
-        line += "o"
-      else
-        line += lookup[key] ? "#" : (visited.has(key) ? "x" : ".")
-    }
-    console.log(line)
-  }
-}
 
 function solve1() {
   instructionsPart1.forEach(instruction => {
@@ -108,8 +74,7 @@ function solve1() {
 
     edges = newEdges
   }
-
-  draw()
+  
   return visited.size + Object.values(lookup).length
 }
 
@@ -124,7 +89,7 @@ const instructionsPart2 = raw
 let target = {x:0, y:0}
 const borders = [] as {from:Vector2, to:Vector2}[]
 
-instructionsPart1
+instructionsPart2
   .forEach(instruction => {
     const current = {...target}
     target = {...target}
@@ -133,58 +98,38 @@ instructionsPart1
     if (instruction.direction === 2) target.x += -instruction.distance
     if (instruction.direction === 3) target.y += -instruction.distance
     
-    if (instruction.direction < 2) borders.push({ from: current, to: target })
+    if (current.x < target.x || current.y < target.y) borders.push({ from: current, to: target })
     else borders.push({ from: target, to: current })
   })
 
-const minx = Math.min(...borders.map(b => b.from.x))
-const maxx = Math.max(...borders.map(b => b.to.x))
-const miny = Math.min(...borders.map(b => b.from.y))
-const maxy = Math.max(...borders.map(b => b.to.y))
 
-const horizontalBorders = borders
-  .filter(b => b.from.x !== b.to.x)
-  .toSorted((a, b) => {
-    const dy = a.from.y - b.from.y
-    if (dy !== 0) return dy < 0 ? -1 : +1
-    const dx = a.from.x - b.from.x
-    if (dx !== 0) return dx < 0 ? -1 : +1
-    return 0
-  })
+// Console.log the SVG path and fill:
+{
+  const minx = Math.min(...borders.map(b => b.from.x)) - 20
+  const miny = Math.min(...borders.map(b => b.from.y)) - 20
+  const maxx = Math.max(...borders.map(b => b.to.x)) + 20
+  const maxy = Math.max(...borders.map(b => b.to.y)) + 20
+  const hx = maxx - minx
+  const hy = maxy - miny
+  const strokeWidth = Math.trunc(Math.max(hx, hy) / 1000)
+  console.log()
+  console.log(`<svg viewBox='${minx} ${miny} ${hx} ${hy}' style="max-height: 98vh" xmlns='http://www.w3.org/2000/svg'>`)
+  console.log(`<path fill="PapayaWhip" stroke="black" stroke-width="${strokeWidth}" d="M 0,0`)
+  target = {x:0, y:0}
+  console.log(instructionsPart2
+    .map(instruction => {
+      if (instruction.direction === 0) target.x += +instruction.distance
+      if (instruction.direction === 1) target.y += +instruction.distance
+      if (instruction.direction === 2) target.x += -instruction.distance
+      if (instruction.direction === 3) target.y += -instruction.distance
+      return `L ${Math.trunc(target.x)},${Math.trunc(target.y)}`
+    })
+    .join(" "))
+  console.log(`" />`)
+  console.log("</svg>")
+}
 
-const verticalBorders = borders
-  .filter(b => b.from.y !== b.to.y)
-  .toSorted((a, b) => {
-    const dx = a.from.x - b.from.x
-    if (dx !== 0) return dx < 0 ? -1 : +1
-    const dy = a.from.y - b.from.y
-    if (dy !== 0) return dy < 0 ? -1 : +1
-    return 0
-  })
-
-let part2 = 0
-
-// for (let x = minx; x <= maxx; x++) {
-//   const relevantHorizontalBorders = horizontalBorders.filter(b => x >= b.from.x && x <= b.to.x)
-//   const relevantVerticalBorders = verticalBorders.filter(b => b.from.x === x)
-
-//   let columnTotal = 0
-//   let nextHorizontalBorder = relevantHorizontalBorders.shift()
-//   let y = nextHorizontalBorder!.from.y
-//   let isInside = true
-//   const boty = relevantHorizontalBorders[relevantHorizontalBorders.length - 1].to.y
-
-//   while (y < boty) {
-//     nextHorizontalBorder = relevantHorizontalBorders.shift()
-//     const nexty = nextHorizontalBorder!.from.y
-//     if (isInside) columnTotal += nexty - y
-//     isInside = !isInside
-//     y = nexty
-//   }
-
-//   console.log(x, " = ", columnTotal)
-//   part2 += columnTotal + relevantVerticalBorders.map(b => b.to.y - b.from.y).reduce(add, 0)
-// }
+let part2 = 0 // borders
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
