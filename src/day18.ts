@@ -18,6 +18,20 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
+// input = `
+// R 10
+
+// D 6
+// L 2
+// U 2
+// L 3
+
+// D 5
+
+// L 5
+// U 9
+// `
+
 input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
@@ -41,6 +55,7 @@ const lookup = { "0;0": location } as Record<string, {x:number, y:number}>
 const visited = new Set<string>()
 
 function solve1() {
+  console.log("Solving part 1...")
   instructionsPart1.forEach(instruction => {
     for (let i = 0; i < instruction.distance; i++) {
       location = {...location}
@@ -82,8 +97,8 @@ const part1 = solve1()
 
 const instructionsPart2 = raw
   .map(([_1, _2, hex]) => ({
-    direction: parseInt(hex.split("")[hex.length - 1]),
-    distance: parseInt(hex.substring(0, 5), 16)
+    direction: parseInt(hex?.split("")[hex.length - 1]),
+    distance: parseInt(hex?.substring(0, 5), 16)
   }))
 
 interface Line {
@@ -141,14 +156,17 @@ const eastWalls = verticals.filter(b => b.direction === 1).toSorted((a,b) => a.x
   // console.log("</svg>")
 }
 
-const points = [] as Vector2[]
+// const points = [] as Vector2[]
 function solve2() {
+  console.log("Solving part 2 might take a while...")
   let insides = 0
   const miny = Math.min(...horizontals.map(b => b.y)) + 1
   const maxy = Math.max(...horizontals.map(b => b.y))
+  const part = Math.trunc((maxy - miny) / 10)
 
   for (let y = miny; y < maxy; y++) {
-    const relevantWestWalls = westWalls.filter(w => w.from.y <= y && w.to.y >= y)
+    if ((y - miny) % part === 0) console.log(`...processed ${Math.round((y - miny) / (maxy - miny) * 100)}%`)
+    const relevantWestWalls = westWalls.filter(w => w.from.y <= y && w.to.y > y)
 
     relevantWestWalls.forEach((west, idx) => {
       const east = eastWalls.filter(e => e.x > west.x && e.from.y <= y && e.to.y >= y)[0]
@@ -178,9 +196,13 @@ function solve2() {
 
 const part2 = solve2()
 
-// for (let y = -2; y < 12; y++) {
+// const minx = Math.min(...verticals.map(b => b.x)) - 1
+// const miny = Math.min(...horizontals.map(b => b.y)) - 1
+// const maxx = Math.max(...verticals.map(b => b.x)) + 1
+// const maxy = Math.max(...horizontals.map(b => b.y)) + 1
+// for (let y = miny; y <= maxy; y++) {
 //   let line = ""
-//   for (let x = -2; x < 9; x++) {
+//   for (let x = minx; x <= maxx; x++) {
 //     const point = points.find(p => p.x === x && p.y === y)
 //     const isInBorder =
 //       horizontals.some(b => b.y === y && b.from.x <= x && b.to.x >= x)
