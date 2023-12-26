@@ -18,7 +18,7 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
-input = Deno.readTextFileSync("./src/inputs/day18.txt")
+// input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
   .trim()
@@ -86,8 +86,10 @@ const instructionsPart2 = raw
     distance: parseInt(hex.substring(0, 5), 16)
   }))
 
+interface Line {from:Vector2, to:Vector2}
+
 let target = {x:0, y:0}
-const borders = [] as {from:Vector2, to:Vector2}[]
+const borders = [] as Line[]
 
 instructionsPart2
   .forEach(instruction => {
@@ -102,34 +104,62 @@ instructionsPart2
     else borders.push({ from: target, to: current })
   })
 
+const verticals = borders.filter(b => b.from.x === b.to.x).map(b => ({...b, x: b.from.x}))
+const horizontals = borders.filter(b => b.from.y === b.to.y).map(b => ({...b, y: b.from.y}))
 
 // Console.log the SVG path and fill:
 {
-  const minx = Math.min(...borders.map(b => b.from.x)) - 20
-  const miny = Math.min(...borders.map(b => b.from.y)) - 20
-  const maxx = Math.max(...borders.map(b => b.to.x)) + 20
-  const maxy = Math.max(...borders.map(b => b.to.y)) + 20
-  const hx = maxx - minx
-  const hy = maxy - miny
-  const strokeWidth = Math.trunc(Math.max(hx, hy) / 1000)
-  console.log()
-  console.log(`<svg viewBox='${minx} ${miny} ${hx} ${hy}' style="max-height: 98vh" xmlns='http://www.w3.org/2000/svg'>`)
-  console.log(`<path fill="PapayaWhip" stroke="black" stroke-width="${strokeWidth}" d="M 0,0`)
-  target = {x:0, y:0}
-  console.log(instructionsPart2
-    .map(instruction => {
-      if (instruction.direction === 0) target.x += +instruction.distance
-      if (instruction.direction === 1) target.y += +instruction.distance
-      if (instruction.direction === 2) target.x += -instruction.distance
-      if (instruction.direction === 3) target.y += -instruction.distance
-      return `L ${Math.trunc(target.x)},${Math.trunc(target.y)}`
-    })
-    .join(" "))
-  console.log(`" />`)
-  console.log("</svg>")
+  // const minx = Math.min(...borders.map(b => b.from.x)) - 20
+  // const miny = Math.min(...borders.map(b => b.from.y)) - 20
+  // const maxx = Math.max(...borders.map(b => b.to.x)) + 20
+  // const maxy = Math.max(...borders.map(b => b.to.y)) + 20
+  // const hx = maxx - minx
+  // const hy = maxy - miny
+  // const strokeWidth = Math.trunc(Math.max(hx, hy) / 1000)
+  // console.log()
+  // console.log(`<svg viewBox='${minx} ${miny} ${hx} ${hy}' style="max-height: 98vh" xmlns='http://www.w3.org/2000/svg'>`)
+  // console.log(`<path fill="PapayaWhip" stroke="black" stroke-width="${strokeWidth}" d="M 0,0`)
+  // target = {x:0, y:0}
+  // console.log(instructionsPart2
+  //   .map(instruction => {
+  //     if (instruction.direction === 0) target.x += +instruction.distance
+  //     if (instruction.direction === 1) target.y += +instruction.distance
+  //     if (instruction.direction === 2) target.x += -instruction.distance
+  //     if (instruction.direction === 3) target.y += -instruction.distance
+  //     return `L ${Math.trunc(target.x)},${Math.trunc(target.y)}`
+  //   })
+  //   .join(" "))
+  // console.log(`" />`)
+  // console.log("</svg>")
 }
 
-let part2 = 0 // borders
+function solve2() {
+
+  function findLeftEndPoint(point: Vector2) {
+    return {
+      x: Math.max(...verticals.filter(b => point.x > b.x && point.y <= b.to.y && point.y >= b.from.y).map(b => b.x)),
+      y: point.y,
+    }
+  }
+  function findRightEndPoint(point: Vector2) {
+    return {
+      x: Math.max(...verticals.filter(b => point.x < b.x && point.y <= b.to.y && point.y >= b.from.y).map(b => b.x)),
+      y: point.y,
+    }
+  }
+
+  const start = {x:1, y:1} // this is a guess!
+  const filledLines: Line[] = [{
+    from: findLeftEndPoint(start),
+    to: findRightEndPoint(start),
+  }]
+
+  // Implement scanline flood fill here
+
+  return borders
+}
+
+let part2 = solve2()
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
