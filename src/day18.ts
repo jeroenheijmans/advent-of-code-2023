@@ -116,33 +116,6 @@ const horizontals = borders.filter(b => b.from.y === b.to.y).map(b => ({...b, y:
 const westWalls = verticals.filter(b => b.direction === 3).toSorted((a,b) => a.x - b.x)
 const eastWalls = verticals.filter(b => b.direction === 1).toSorted((a,b) => a.x - b.x)
 
-// Console.log the SVG path and fill:
-{
-  // const minx = Math.min(...borders.map(b => b.from.x)) - 20
-  // const miny = Math.min(...borders.map(b => b.from.y)) - 20
-  // const maxx = Math.max(...borders.map(b => b.to.x)) + 20
-  // const maxy = Math.max(...borders.map(b => b.to.y)) + 20
-  // const hx = maxx - minx
-  // const hy = maxy - miny
-  // const strokeWidth = Math.trunc(Math.max(hx, hy) / 1000)
-  // console.log()
-  // console.log(`<svg viewBox='${minx} ${miny} ${hx} ${hy}' style="max-height: 98vh" xmlns='http://www.w3.org/2000/svg'>`)
-  // console.log(`<path fill="PapayaWhip" stroke="black" stroke-width="${strokeWidth}" d="M 0,0`)
-  // target = {x:0, y:0}
-  // console.log(instructionsPart2
-  //   .map(instruction => {
-  //     if (instruction.direction === 0) target.x += +instruction.distance
-  //     if (instruction.direction === 1) target.y += +instruction.distance
-  //     if (instruction.direction === 2) target.x += -instruction.distance
-  //     if (instruction.direction === 3) target.y += -instruction.distance
-  //     return `L ${Math.trunc(target.x)},${Math.trunc(target.y)}`
-  //   })
-  //   .join(" "))
-  // console.log(`" />`)
-  // console.log("</svg>")
-}
-
-// const points = [] as Vector2[]
 function solve2() {
   console.log("Solving part 2 might take a while...")
   let insides = 0
@@ -166,13 +139,10 @@ function solve2() {
         if (!isEastWallBetweenUs) return
       }
       
-      const dist = east.x - west.x - 1
-      
+      // Skip if the range is overlapping with a horizontal wall
       if (relevantHorizontals.some(h => h.from.x <= west.x && h.to.x >= east.x)) return
-
-      // for (let x = west.x + 1; x < east.x; x++) points.push({x, y})
       
-      insides += dist
+      insides += east.x - west.x - 1
     })
   }
 
@@ -183,23 +153,6 @@ function solve2() {
 }
 
 const part2 = solve2()
-
-// const minx = Math.min(...verticals.map(b => b.x)) - 1
-// const miny = Math.min(...horizontals.map(b => b.y)) - 1
-// const maxx = Math.max(...verticals.map(b => b.x)) + 1
-// const maxy = Math.max(...horizontals.map(b => b.y)) + 1
-// for (let y = miny; y <= maxy; y++) {
-//   let line = ""
-//   for (let x = minx; x <= maxx; x++) {
-//     const point = points.find(p => p.x === x && p.y === y)
-//     const isInBorder =
-//       horizontals.some(b => b.y === y && b.from.x <= x && b.to.x >= x)
-//       ||
-//       verticals.some(b => b.x === x && b.from.y <= y && b.to.y >= y)
-//     line += point ? "O" : (isInBorder ? "█" : ".")
-//   }
-//   console.log(line)
-// }
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
