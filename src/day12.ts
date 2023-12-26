@@ -10,8 +10,6 @@ let input = `
 ?###???????? 3,2,1
 `
 
-// input = '????.#...#... 4,1,1'
-// input = '????.######..#####. 1,6,5'
 input = Deno.readTextFileSync("./src/inputs/day12.txt")
 
 const data = input
@@ -20,110 +18,52 @@ const data = input
   .split(/\r?\n/)
   .filter(x => x)
   .map(x => x.split(" "))
-  .map(([line, nrs]) => ({
-    line,
+  .map(([pattern, nrs]) => ({
+    pattern,
     nrs: nrs.split(",").map(n => parseInt(n))
   }))
 
-function isValid(line: string, nrs: number[]) {
-  let currentGroupSize = 0
-  let idx = 0
-  let next = ""
-
-  for (let i = 0; i < line.length; i++) {
-    next = line[i]
-
-    if (next === "." && currentGroupSize !== 0) {
-      if (currentGroupSize !== nrs[idx++]) return false
-      currentGroupSize = 0
+function countOptions(pattern: string, nrs: number[]) {
+  function isStillPossible(current: string, pattern: string) {
+    for (let i = 0; i < current.length; i++) {
+      if (pattern[i] !== "?" && pattern[i] !== current[i]) return false
     }
-
-    if (next === "#") currentGroupSize++
-  }
-  
-  if (next === "#") return currentGroupSize === nrs[idx++] && idx === nrs.length
-  if (next === ".") return idx === nrs.length
-
-  return idx === nrs.length
-}
-
-function mightStillBeValid(line: string, nrs: number[]) {
-  let currentGroupSize = 0
-  let idx = 0
-  let next = ""
-
-  for (let i = 0; i < line.length; i++) {
-    next = line[i]
-
-    if (next === "?") return true
-
-    if (next === "." && currentGroupSize !== 0) {
-      if (currentGroupSize !== nrs[idx++]) return false
-      currentGroupSize = 0
-    }
-
-    if (next === "#") currentGroupSize++
-    if (currentGroupSize > nrs[idx]) return false
-  }
-  
-  if (next === "#") return currentGroupSize === nrs[idx++] && idx === nrs.length
-  if (next === ".") return idx === nrs.length
-
-  return idx === nrs.length
-}
-
-function getArrangements(input: string, nrs: number[]) {
-  let possibilities = 0
-
-  function buildPossibilities(line: string) {
-
-    const index = line.indexOf("?")
-
-    if (index < 0) {
-      if (isValid(line, nrs)) possibilities++
-      return
-    }
-
-    const option1 = line.replaceAt(index, ".")
-    const option2 = line.replaceAt(index, "#")
-
-    if (mightStillBeValid(option1, nrs)) buildPossibilities(option1)
-    if (mightStillBeValid(option2, nrs)) buildPossibilities(option2)
+    return true
   }
 
-  buildPossibilities(input)
+  function countVariations(length: number, nrs: number[], current: string) {
 
-  return possibilities
-}
+    if (nrs.length === 0) {
+      const option = current.padEnd(length, ".")
+      if (!isStillPossible(option, pattern)) return 0
+      // console.log(option)
+      return 1
+    }
 
-const part1 = data
-  .map(({line, nrs}, index) => {
-    // const started = new Date().getTime()
-    const result = getArrangements(
-      line.replaceAll(/\.\./g, '.'),
-      nrs,
-    )
-    // const ended = new Date().getTime()
-    // console.log(`Line ${index + 1} ran in ${ended - started}ms`)
+    if (!isStillPossible(current, pattern)) return 0
+
+    const currentEndsWithMark = current.at(-1) === "#"
+    const [next, ...rest] = nrs
+    const minimumLengthForRest = rest.reduce(add, 0) - rest.length
+    const leftOverLength = length - current.length
+    const maxLengthForNext = leftOverLength - minimumLengthForRest
+    const maxOffset = maxLengthForNext - next
+
+    let result = 0
+    for (let offset = currentEndsWithMark ? 1 : 0; offset <= maxOffset; offset++) {
+      const option = current + (".".repeat(offset) + "#".repeat(next))
+      result += countVariations(length, rest, option)
+    }
     return result
-  })
-  .reduce(add, 0)
+  }
+
+  return countVariations(pattern.length, nrs, "")
+}
+
+const part1 = data.map(line => countOptions(line.pattern, line.nrs)).reduce(add, 0)
+const part2 = 0
 
 console.log("Part 1:", part1)
-
-const part2 = 0 /* data
-  .map(({line, nrs}, index) => {
-    const started = new Date().getTime()
-    const result = getArrangements(
-      [line, line, line, line, line].join("?").replaceAll(/\.\./g, '.'),
-      [...nrs, ...nrs, ...nrs, ...nrs, ...nrs]
-    )
-    const ended = new Date().getTime()
-    console.log(`Line ${index + 1} ran in ${ended - started}ms`)
-    return result
-  })
-  .reduce(add, 0)*/
-
 console.log("Part 2:", part2)
 
 finishDay()
