@@ -1,4 +1,4 @@
-import {startDay, finishDay, Vector2} from './util.ts'
+import {startDay, finishDay, Vector2, add} from './util.ts'
 startDay(18)
 
 let input = `
@@ -86,13 +86,16 @@ const instructionsPart2 = raw
     distance: parseInt(hex.substring(0, 5), 16)
   }))
 
-interface Line {from:Vector2, to:Vector2}
+interface Line {
+  from:Vector2,
+  to:Vector2,
+  direction: number,
+}
 
 let target = {x:0, y:0}
-const borders = [] as Line[]
-
-instructionsPart2
-  .forEach(instruction => {
+const borders = instructionsPart2
+  .reduce((result, instruction) => {
+    const direction = instruction.direction
     const current = {...target}
     target = {...target}
     if (instruction.direction === 0) target.x += +instruction.distance
@@ -100,12 +103,17 @@ instructionsPart2
     if (instruction.direction === 2) target.x += -instruction.distance
     if (instruction.direction === 3) target.y += -instruction.distance
     
-    if (current.x < target.x || current.y < target.y) borders.push({ from: current, to: target })
-    else borders.push({ from: target, to: current })
-  })
+    if (current.x < target.x || current.y < target.y) result.push({ from: current, to: target, direction })
+    else result.push({ from: target, to: current, direction })
+
+    return result
+  }, [] as Line[])
 
 const verticals = borders.filter(b => b.from.x === b.to.x).map(b => ({...b, x: b.from.x}))
 const horizontals = borders.filter(b => b.from.y === b.to.y).map(b => ({...b, y: b.from.y}))
+
+const westWalls = verticals.filter(b => b.direction === 3).toSorted((a,b) => a.x - b.x)
+const eastWalls = verticals.filter(b => b.direction === 1).toSorted((a,b) => a.x - b.x)
 
 // Console.log the SVG path and fill:
 {
@@ -134,34 +142,27 @@ const horizontals = borders.filter(b => b.from.y === b.to.y).map(b => ({...b, y:
 }
 
 function solve2() {
+  let insides = 0
+  const miny = Math.min(...horizontals.map(b => b.y)) + 1
+  const maxy = Math.max(...horizontals.map(b => b.y))
 
-  function findLeftEndPoint(point: Vector2) {
-    return {
-      x: Math.max(...verticals.filter(b => point.x > b.x && point.y <= b.to.y && point.y >= b.from.y).map(b => b.x)),
-      y: point.y,
-    }
-  }
-  function findRightEndPoint(point: Vector2) {
-    return {
-      x: Math.max(...verticals.filter(b => point.x < b.x && point.y <= b.to.y && point.y >= b.from.y).map(b => b.x)),
-      y: point.y,
-    }
+  for (let y = miny; y < maxy; y++) {
+    const relevantWestWalls = westWalls.filter(w => w.from.y <= y && w.to.y >= y)
+    relevantWestWalls.forEach(west => {
+      const east = eastWalls.filter(e => e.x > west.x && e.from.y <= y && e.to.y >= y)[0]
+      insides += east.x - west.x
+    })
   }
 
-  const start = {x:1, y:1} // this is a guess!
-  const filledLines: Line[] = [{
-    from: findLeftEndPoint(start),
-    to: findRightEndPoint(start),
-  }]
-
-  // Implement scanline flood fill here
-
-  return borders
+  const vsize = verticals.map(b => b.to.y - b.from.y).reduce(add, 0)
+  const hsize = horizontals.map(b => b.to.y - b.from.y).reduce(add, 0)
+  
+  return insides + vsize + hsize
 }
 
-let part2 = solve2()
+const part2 = solve2()
 
 console.log("Part 1:", part1)
-console.log("Part 2:", part2)
+console.log("Part 2:", part2, "diff is", part2 - 952408144115)
 
 finishDay()
