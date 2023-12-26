@@ -18,7 +18,7 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day18.txt")
+input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
   .trim()
@@ -141,6 +141,7 @@ const eastWalls = verticals.filter(b => b.direction === 1).toSorted((a,b) => a.x
   // console.log("</svg>")
 }
 
+const points = [] as Vector2[]
 function solve2() {
   let insides = 0
   const miny = Math.min(...horizontals.map(b => b.y)) + 1
@@ -148,21 +149,49 @@ function solve2() {
 
   for (let y = miny; y < maxy; y++) {
     const relevantWestWalls = westWalls.filter(w => w.from.y <= y && w.to.y >= y)
-    relevantWestWalls.forEach(west => {
+
+    relevantWestWalls.forEach((west, idx) => {
       const east = eastWalls.filter(e => e.x > west.x && e.from.y <= y && e.to.y >= y)[0]
-      insides += east.x - west.x
+
+      // Skip west walls that will be followed by another west wall
+      const nextWestWall = relevantWestWalls.at(idx + 1)
+      if (nextWestWall) {
+        const isEastWallBetweenUs = east.x > west.x && east.x < nextWestWall.x
+        if (!isEastWallBetweenUs) return
+      }
+      
+      const dist = east.x - west.x - 1
+      // for (let x = west.x + 1; x < east.x; x++) points.push({x, y})
+      
+      // console.log("At y =", y, "adding", dist)
+      insides += dist
     })
   }
 
   const vsize = verticals.map(b => b.to.y - b.from.y).reduce(add, 0)
-  const hsize = horizontals.map(b => b.to.y - b.from.y).reduce(add, 0)
+  const hsize = horizontals.map(b => b.to.x - b.from.x).reduce(add, 0)
+
+  // console.log("H =", hsize, "V =", vsize)
   
   return insides + vsize + hsize
 }
 
 const part2 = solve2()
 
+// for (let y = -2; y < 12; y++) {
+//   let line = ""
+//   for (let x = -2; x < 9; x++) {
+//     const point = points.find(p => p.x === x && p.y === y)
+//     const isInBorder =
+//       horizontals.some(b => b.y === y && b.from.x <= x && b.to.x >= x)
+//       ||
+//       verticals.some(b => b.x === x && b.from.y <= y && b.to.y >= y)
+//     line += point ? "O" : (isInBorder ? "#" : ".")
+//   }
+//   console.log(line)
+// }
+
 console.log("Part 1:", part1)
-console.log("Part 2:", part2, "diff is", part2 - 952408144115)
+console.log("Part 2:", part2)
 
 finishDay()
