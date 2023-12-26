@@ -18,20 +18,6 @@ L 2 (#015232)
 U 2 (#7a21e3)
 `
 
-// input = `
-// R 10
-
-// D 6
-// L 2
-// U 2
-// L 3
-
-// D 5
-
-// L 5
-// U 9
-// `
-
 input = Deno.readTextFileSync("./src/inputs/day18.txt")
 
 const raw = input
@@ -166,7 +152,9 @@ function solve2() {
 
   for (let y = miny; y < maxy; y++) {
     if ((y - miny) % part === 0) console.log(`...processed ${Math.round((y - miny) / (maxy - miny) * 100)}%`)
-    const relevantWestWalls = westWalls.filter(w => w.from.y <= y && w.to.y > y)
+
+    const relevantWestWalls = westWalls.filter(w => w.from.y <= y && w.to.y >= y)
+    const relevantHorizontals = horizontals.filter(h => h.y === y)
 
     relevantWestWalls.forEach((west, idx) => {
       const east = eastWalls.filter(e => e.x > west.x && e.from.y <= y && e.to.y >= y)[0]
@@ -179,9 +167,11 @@ function solve2() {
       }
       
       const dist = east.x - west.x - 1
+      
+      if (relevantHorizontals.some(h => h.from.x <= west.x && h.to.x >= east.x)) return
+
       // for (let x = west.x + 1; x < east.x; x++) points.push({x, y})
       
-      // console.log("At y =", y, "adding", dist)
       insides += dist
     })
   }
@@ -189,8 +179,6 @@ function solve2() {
   const vsize = verticals.map(b => b.to.y - b.from.y).reduce(add, 0)
   const hsize = horizontals.map(b => b.to.x - b.from.x).reduce(add, 0)
 
-  // console.log("H =", hsize, "V =", vsize)
-  
   return insides + vsize + hsize
 }
 
@@ -208,7 +196,7 @@ const part2 = solve2()
 //       horizontals.some(b => b.y === y && b.from.x <= x && b.to.x >= x)
 //       ||
 //       verticals.some(b => b.x === x && b.from.y <= y && b.to.y >= y)
-//     line += point ? "O" : (isInBorder ? "#" : ".")
+//     line += point ? "O" : (isInBorder ? "█" : ".")
 //   }
 //   console.log(line)
 // }
