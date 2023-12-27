@@ -10,7 +10,12 @@ let input = `
 ?###???????? 3,2,1
 `
 
+// input = `
+// ????????? 2,3
+// `
+
 input = Deno.readTextFileSync("./src/inputs/day12.txt")
+// input = await Bun.file("./src/inputs/day12.txt").text()
 
 const data = input
   .replaceAll(/(\.\.)+/g, ".")
@@ -32,9 +37,17 @@ function countOptions(pattern: string, nrs: number[]) {
     return true
   }
 
+  const length = pattern.length
   const maxIndex = nrs.length
+  const minLengthForRestAtIndex = [] as number[]
+  for (let n = 0; n < maxIndex; n++) {
+    minLengthForRestAtIndex[n] = 0
+    for (let i = n + 1; i < maxIndex; i++) {
+      minLengthForRestAtIndex[n] += nrs[i] + 1
+    }
+  }
 
-  function countVariations(length: number, current: string, index: number) {
+  function countVariations(current: string, index: number) {
     if (index === maxIndex) {
       const option = current.padEnd(length, ".")
       if (!isStillPossible(current.length, option)) return 0
@@ -43,37 +56,33 @@ function countOptions(pattern: string, nrs: number[]) {
     }
 
     const currentLength = current.length
-    const currentEndsWithMark = current[currentLength - 1] === "#"
     const next = nrs[index]
 
-    let minimumLengthForRest = 0
-    for (let i = index + 1; i < nrs.length; i++) {
-      minimumLengthForRest += nrs[i] + 1
-    }
-
     const leftOverLength = length - currentLength
-    const maxLengthForNext = leftOverLength - minimumLengthForRest
+    const maxLengthForNext = leftOverLength - minLengthForRestAtIndex[index]
     const maxOffset = maxLengthForNext - next
+    const isLastNr = index === maxIndex - 1
 
     let result = 0
-    for (let offset = currentEndsWithMark ? 1 : 0; offset <= maxOffset; offset++) {
-      // Note to self to try to improve this...
-      // Let's say we're looking at a nr 3 for a max string length of 8
-      // A. Then all variants ending in "." can be grouped
-      // B. Then all variants ending in "#" (which is only 1, right?) can be grouped
-      // We can calculate only 1 option out of group A for follow-up options
-      // And multiply it to the number of variants for "rest" to get a tally
-      const option = current + (".".repeat(offset) + "#".repeat(next))
+    const baseText = "#".repeat(next)
+    let offsetText = ""
+    for (let offset = 0; offset <= maxOffset; offset++) {
+      let option = current + offsetText + baseText
+      offsetText += "."
+      if (!isLastNr) option += "."
       if (!isStillPossible(currentLength, option)) continue
-      result += countVariations(length, option, index + 1)
+      result += countVariations(option, index + 1)
     }
     return result
   }
 
-  return countVariations(pattern.length, "", 0)
+  return countVariations("", 0)
 }
 
 const part1 = data.map(line => countOptions(line.pattern, line.nrs)).reduce(add, 0)
+
+console.log("Part 1:", part1)
+
 const part2 = data
   .map(x => ({
     pattern: [x.pattern, x.pattern, x.pattern, x.pattern, x.pattern].join("?"),
@@ -87,7 +96,6 @@ const part2 = data
   })
   .reduce(add, 0)
 
-console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
 finishDay()
