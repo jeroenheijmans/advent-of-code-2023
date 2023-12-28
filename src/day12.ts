@@ -33,15 +33,15 @@ function countOptions(pattern: string, nrs: number[]) {
   }
 
   const maxIndex = nrs.length
+  const memoizedResults: Record<string, number> = {}
   const minLengthForRestAtIndex = [] as number[]
+
   for (let n = 0; n < maxIndex; n++) {
     minLengthForRestAtIndex[n] = 0
     for (let i = n + 1; i < maxIndex; i++) {
       minLengthForRestAtIndex[n] += nrs[i] + 1
     }
   }
-
-  const memoizedResults: Record<string, number> = {}
 
   function countVariations(current: string, index: number) {
     if (index === maxIndex) {
@@ -68,11 +68,9 @@ function countOptions(pattern: string, nrs: number[]) {
       if (!isStillPossible(currentLength, option)) continue
 
       const key = `${nextIndex};${option.length}`
-      
       if (memoizedResults[key] === undefined) {
         memoizedResults[key] = countVariations(option, nextIndex)
       } 
-
       result += memoizedResults[key]
     }
 
@@ -86,8 +84,6 @@ const part1 = data
   .map(x => countOptions(x.pattern, x.nrs))
   .reduce(add, 0)
 
-console.log("Part 1:", part1)
-
 const part2 = data
   .map(x => countOptions(
     [x.pattern, x.pattern, x.pattern, x.pattern, x.pattern].join("?"),
@@ -95,6 +91,7 @@ const part2 = data
   )
   .reduce(add, 0)
 
+console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
 finishDay()
