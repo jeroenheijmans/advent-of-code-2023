@@ -10,12 +10,9 @@ let input = `
 ?###???????? 3,2,1
 `
 
-// input = `
-// ????????? 2,3
-// `
+// input = `????????? 2,3`
 
 input = Deno.readTextFileSync("./src/inputs/day12.txt")
-// input = await Bun.file("./src/inputs/day12.txt").text()
 
 const data = input
   .replaceAll(/(\.\.)+/g, ".")
@@ -47,6 +44,8 @@ function countOptions(pattern: string, nrs: number[]) {
     }
   }
 
+  const cachedResults: Record<string, number> = {}
+
   function countVariations(current: string, index: number) {
     if (index === maxIndex) {
       const option = current.padEnd(length, ".")
@@ -63,15 +62,28 @@ function countOptions(pattern: string, nrs: number[]) {
     const maxOffset = maxLengthForNext - next
     const isLastNr = index === maxIndex - 1
 
-    let result = 0
+    const nextIndex = index + 1
     const baseText = "#".repeat(next)
     let offsetText = ""
+    let result = 0
+
     for (let offset = 0; offset <= maxOffset; offset++) {
       let option = current + offsetText + baseText
       offsetText += "."
       if (!isLastNr) option += "."
       if (!isStillPossible(currentLength, option)) continue
-      result += countVariations(option, index + 1)
+
+      const len = option.length
+      const key = `${nextIndex};${len}`
+      
+      if (cachedResults[key] || cachedResults[key] == 0) {
+        result += cachedResults[key]
+      } else {
+        const added = countVariations(option, nextIndex)
+        cachedResults[key] = added
+        result += added
+      }
+
     }
     return result
   }
