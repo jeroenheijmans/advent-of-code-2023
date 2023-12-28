@@ -15,7 +15,21 @@ let input = `
 ...........
 `
 
-// input = Deno.readTextFileSync("./src/inputs/day21.txt")
+// input = `
+// ...........
+// ...........
+// ...........
+// ...........
+// ...........
+// .....S.....
+// ...........
+// ...........
+// ...........
+// ...........
+// ...........
+// `
+
+input = Deno.readTextFileSync("./src/inputs/day21.txt")
 
 interface Location extends Vector2 {
   key: string
@@ -48,11 +62,10 @@ const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = 6
+const maxi = 120
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 let options = [start]
 for (let i = 0; i < maxi; i++) {
-  if (i > 100) console.log("After step", i, "size is", options.length)
   // console.log(options.length)
 
   const newOptions: Vector2[] = []
@@ -75,7 +88,7 @@ for (let i = 0; i < maxi; i++) {
 
       newOptions.push(newPos)
     })
-  })
+  }) 
 
   options = newOptions
 }
@@ -86,24 +99,35 @@ function draw() {
   const x2 = Math.max(...options.map(o => o.x))
   const y2 = Math.max(...options.map(o => o.y))
 
-  const fromx = (Math.trunc(x1 / maxx) - 1) * maxx + 1
-  const fromy = (Math.trunc(y1 / maxy) - 1) * maxy + 1
-  const tox = (Math.trunc(x2 / maxx) + 1) * maxx
-  const toy = (Math.trunc(y2 / maxy) + 1) * maxy
+  const width = data[0].length
+  const height = data.length
+
+  const bonusx1 = Math.abs(Math.floor(x1 / width) - 1)
+  const bonusy1 = Math.abs(Math.floor(y1 / height) - 1)
+  const bonusx2 = Math.abs(Math.ceil(x2 / width))
+  const bonusy2 = Math.abs(Math.ceil(y2 / height))
+
+  const bonus = Math.max(bonusx1, bonusx2, bonusy1, bonusy2)
+
+  const fromx = -(bonus - 1) * width
+  const fromy = -(bonus - 1) * height
+  const tox = bonus * width
+  const toy = bonus * height
 
   for (let y = fromy; y < toy; y++) {
     let line = ""
     for (let x = fromx; x < tox; x++) {
-      const lookupX = x >= 0 ? (x % maxx) : (maxx + (x % maxx))
-      const lookupY = y >= 0 ? (y % maxy) : (maxy + (y % maxy))
+      const lookupX = x >= 0 ? (x % width) : (width + (x % width) - 1)
+      const lookupY = y >= 0 ? (y % height) : (height + (y % height) - 1)
       const target = lookup[`${lookupX};${lookupY}`]
-      line += options.find(o => o.x === x && o.y === y) ? "O" : target.char
+      // line += target.char
+      line += options.find(o => o.x === x && o.y === y) ? "O" : target.char.replace("#", "█").replace(".", "·")
     }
     console.log(line)
   }
 }
 
-// draw()
+draw()
 
 const part2 = options.length
 console.log("Part 2:", part2)
