@@ -10,8 +10,6 @@ let input = `
 ?###???????? 3,2,1
 `
 
-// input = `????????? 2,3`
-
 input = Deno.readTextFileSync("./src/inputs/day12.txt")
 
 const data = input
@@ -34,7 +32,6 @@ function countOptions(pattern: string, nrs: number[]) {
     return true
   }
 
-  const length = pattern.length
   const maxIndex = nrs.length
   const minLengthForRestAtIndex = [] as number[]
   for (let n = 0; n < maxIndex; n++) {
@@ -44,68 +41,58 @@ function countOptions(pattern: string, nrs: number[]) {
     }
   }
 
-  const cachedResults: Record<string, number> = {}
+  const memoizedResults: Record<string, number> = {}
 
   function countVariations(current: string, index: number) {
     if (index === maxIndex) {
-      const option = current.padEnd(length, ".")
-      if (!isStillPossible(current.length, option)) return 0
-      // console.log(option)
-      return 1
+      const option = current.padEnd(pattern.length, ".")
+      return isStillPossible(current.length, option) ? 1 : 0
     }
 
     const currentLength = current.length
     const next = nrs[index]
-
-    const leftOverLength = length - currentLength
+    const leftOverLength = pattern.length - currentLength
     const maxLengthForNext = leftOverLength - minLengthForRestAtIndex[index]
     const maxOffset = maxLengthForNext - next
     const isLastNr = index === maxIndex - 1
-
     const nextIndex = index + 1
     const baseText = "#".repeat(next)
+
     let offsetText = ""
     let result = 0
 
     for (let offset = 0; offset <= maxOffset; offset++) {
-      let option = current + offsetText + baseText
+      const option = current + offsetText + baseText + (isLastNr ? "" : ".")
       offsetText += "."
-      if (!isLastNr) option += "."
+      
       if (!isStillPossible(currentLength, option)) continue
 
-      const len = option.length
-      const key = `${nextIndex};${len}`
+      const key = `${nextIndex};${option.length}`
       
-      if (cachedResults[key] || cachedResults[key] == 0) {
-        result += cachedResults[key]
-      } else {
-        const added = countVariations(option, nextIndex)
-        cachedResults[key] = added
-        result += added
-      }
+      if (memoizedResults[key] === undefined) {
+        memoizedResults[key] = countVariations(option, nextIndex)
+      } 
 
+      result += memoizedResults[key]
     }
+
     return result
   }
 
   return countVariations("", 0)
 }
 
-const part1 = data.map(line => countOptions(line.pattern, line.nrs)).reduce(add, 0)
+const part1 = data
+  .map(x => countOptions(x.pattern, x.nrs))
+  .reduce(add, 0)
 
 console.log("Part 1:", part1)
 
 const part2 = data
-  .map(x => ({
-    pattern: [x.pattern, x.pattern, x.pattern, x.pattern, x.pattern].join("?"),
-    nrs: [...x.nrs, ...x.nrs, ...x.nrs, ...x.nrs, ...x.nrs] }))
-  .map((x, idx) => {
-    const start = new Date().getTime()
-    const result = countOptions(x.pattern, x.nrs)
-    const end = new Date().getTime()
-    console.log(`Line ${idx + 1} took ${((end-start)/1000).toFixed(3)} seconds`);
-    return result
-  })
+  .map(x => countOptions(
+    [x.pattern, x.pattern, x.pattern, x.pattern, x.pattern].join("?"),
+    [...x.nrs, ...x.nrs, ...x.nrs, ...x.nrs, ...x.nrs] )
+  )
   .reduce(add, 0)
 
 console.log("Part 2:", part2)
