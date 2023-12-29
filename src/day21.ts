@@ -42,13 +42,15 @@ const data = input
   .filter(x => x)
   .map(line => line.split(""))
 
-const locations = data
+const grid = data
   .map((line, y) => line.map((char, x) => ({
     key: `${x};${y}`,
     x,
     y,
     char,
   })))
+
+const locations = grid
   .flat()
 
 const maxx = data[0].length, maxy = data.length
@@ -62,7 +64,7 @@ const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = 65
+const maxi = 64
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 let options = [start]
 let part1 = 0
@@ -96,6 +98,30 @@ for (let i = 0; i < maxi; i++) {
 
   if (i === 63) part1 = options.length
 }
+
+const quickcheck = grid.map(locs => new Set(locs.filter(l => l.char === ".").map(l => l.x)))
+
+let part2 = 0
+// const maxsteps = 6
+const maxsteps = 26501365
+const halfwayX = start.x
+const halfwayY = start.y
+
+for (let y = 0; y <= maxsteps; y++) {
+  console.log(y)
+
+  const upperx = maxsteps - y
+
+  for (let x = 0; x <= upperx; x++) {
+    if ((x + y) % 2 !== 0) continue
+
+    const myx = (halfwayX + x) % maxx
+    const myy = (halfwayY + y) % maxy
+
+    if (quickcheck[myy].has(myx)) part2 += 4 // this is a stupid assumption tho
+  }
+}
+
 
 function draw() {
   const x1 = Math.min(...options.map(o => o.x))
@@ -133,9 +159,8 @@ function draw() {
   }
 }
 
-draw()
+// draw()
 
-const part2 = options.length
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
