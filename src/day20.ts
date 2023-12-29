@@ -135,6 +135,9 @@ const debug = max < 5
 let lows = 0
 let highs = 0
 
+const previouses: Record<string, number> = {}
+const results: Record<string, number> = {}
+
 for (let i = 0; i < max; i++) {
   debug("Button press " + i)
   lows++
@@ -170,6 +173,10 @@ for (let i = 0; i < max; i++) {
         {
           module.memories[pulse.from] = pulse.value
           const value = !Object.values(module.memories).every(v => v)
+          if (!value) {
+            if (!previouses[module.name]) previouses[module.name] = i
+            else results[module.name] = i - previouses[module.name]
+          }
           module.targets.forEach(target => pulses.push({ from, target, value }))
         }
         break
@@ -178,24 +185,13 @@ for (let i = 0; i < max; i++) {
         break
     }
   }
-
-  // if (i % 1e4 === 0)
-    // console.log(
-    //   Object.values(
-    //     Object.groupBy(
-    //       modules.filter(m => m.type !== "conj"),
-    //       ({depth}) => depth,
-    //     )
-    //   )
-    //     .map(group => group.map(m => m.signal ? "#" : ".").toSorted().join("")).join("  ")
-    // )
 }
 
 const part1 = lows * highs
 
-const part2 = 0 // lookup
+const part2 = results["gp"] * results["jn"] * results["jl"] * results["fb"]
 
 console.log("Part 1:", part1)
-console.log("Part 2:", part2)
+console.log("Part 2:", part2, "(Warning: not generalized, I manually found the relevant nodes)")
 
 finishDay()
