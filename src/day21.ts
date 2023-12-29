@@ -65,6 +65,8 @@ location0.char = "."
 const maxi = 120
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 let options = [start]
+let part1 = 0
+
 for (let i = 0; i < maxi; i++) {
   // console.log(options.length)
 
@@ -91,6 +93,8 @@ for (let i = 0; i < maxi; i++) {
   }) 
 
   options = newOptions
+
+  if (i === 63) part1 = options.length
 }
 
 function draw() {
@@ -127,9 +131,10 @@ function draw() {
   }
 }
 
-draw()
+// draw()
 
 const part2 = options.length
+console.log("Part 1:", part1)
 console.log("Part 2:", part2)
 
 finishDay()
