@@ -39,6 +39,12 @@ export interface Ray2 extends Vector2 {
   vy: number
 }
 
+export interface Ray3 extends Vector3 {
+  vx: number
+  vy: number
+  vz: number
+}
+
 export function add(a: number, b: number) {
   return a + b;
 }
