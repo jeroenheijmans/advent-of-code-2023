@@ -64,13 +64,13 @@ const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = 64
+const maxi = 750
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 let options = [start]
 let part1 = 0
 
 for (let i = 0; i < maxi; i++) {
-  // console.log(options.length)
+  if (i % 65 === 0) console.log(options.length)
 
   const newOptions: Vector2[] = []
   const considered = new Set<string>()
@@ -97,29 +97,6 @@ for (let i = 0; i < maxi; i++) {
   options = newOptions
 
   if (i === 63) part1 = options.length
-}
-
-const quickcheck = grid.map(locs => new Set(locs.filter(l => l.char === ".").map(l => l.x)))
-
-let part2 = 0
-// const maxsteps = 6
-const maxsteps = 26501365
-const halfwayX = start.x
-const halfwayY = start.y
-
-for (let y = 0; y <= maxsteps; y++) {
-  console.log(y)
-
-  const upperx = maxsteps - y
-
-  for (let x = 0; x <= upperx; x++) {
-    if ((x + y) % 2 !== 0) continue
-
-    const myx = (halfwayX + x) % maxx
-    const myy = (halfwayY + y) % maxy
-
-    if (quickcheck[myy].has(myx)) part2 += 4 // this is a stupid assumption tho
-  }
 }
 
 
@@ -162,6 +139,6 @@ function draw() {
 // draw()
 
 console.log("Part 1:", part1)
-console.log("Part 2:", part2)
+console.log("Part 2:", 0, "(38893493797086 is 'too low')")
 
 finishDay()
