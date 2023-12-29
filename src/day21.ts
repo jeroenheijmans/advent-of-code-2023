@@ -1,4 +1,4 @@
-import {startDay, finishDay, Vector2, drawGrid} from './util.ts'
+import {startDay, finishDay, Vector2} from './util.ts'
 startDay(21)
 
 let input = `
@@ -62,7 +62,7 @@ const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = 120
+const maxi = 65
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 let options = [start]
 let part1 = 0
@@ -124,14 +124,16 @@ function draw() {
       const lookupX = x >= 0 ? (x % width) : (width + (x % width) - 1)
       const lookupY = y >= 0 ? (y % height) : (height + (y % height) - 1)
       const target = lookup[`${lookupX};${lookupY}`]
-      // line += target.char
-      line += options.find(o => o.x === x && o.y === y) ? "O" : target.char.replace("#", "█").replace(".", "·")
+      line += options.find(o => o.x === x && o.y === y) ? "O" : target.char.replace("#", " ").replace(".", "·")
+      // const cls = options.find(o => o.x === x && o.y === y) ? "o" : target.char.replace("#", "x").replace(".", "p")
+      // line += `<div class="${cls}"></div>`
     }
+    // console.log(`<div class="row">${line}</div>`)
     console.log(line)
   }
 }
 
-// draw()
+draw()
 
 const part2 = options.length
 console.log("Part 1:", part1)
