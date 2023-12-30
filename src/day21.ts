@@ -109,13 +109,15 @@ console.log(locations.filter(l => l.char === "."&& (l.x + l.y) % 2 === 1 &&
 
 
 function draw() {
-  for (let y = -maxi; y <= maxi; y++) {
+  const displaySize = Math.ceil(maxi / midPoint) * midPoint
+
+  for (let y = -displaySize; y <= displaySize; y++) {
     let line = ""
-    for (let x = -maxi; x <= maxi; x++) {
+    for (let x = -displaySize; x <= displaySize; x++) {
       const lookupX = x > midPoint ? (x > midPoint ? x - gridSize : x) : (x < -midPoint ? gridSize + x : x)
       const lookupY = y > midPoint ? (y > midPoint ? y - gridSize : y) : (y < -midPoint ? gridSize + y : y)
       const target = lookup[`${lookupX};${lookupY}`]
-      line += options.find(o => o.x === x && o.y === y) ? "O" : target.char.replace("#", " ").replace(".", "·")
+      line += options.find(o => o.x === x && o.y === y) ? "X" : target.char.replace(".", "·").replace("#", "█")
       // const cls = options.find(o => o.x === x && o.y === y) ? "o" : target.char.replace("#", "x").replace(".", "p")
       // line += `<div class="${cls}"></div>`
     }
