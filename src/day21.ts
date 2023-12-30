@@ -29,7 +29,23 @@ let input = `
 // ...........
 // `
 
-input = Deno.readTextFileSync("./src/inputs/day21.txt")
+input = `
+.##........#.
+#...........#
+.....#.#.....
+....#...#....
+...#.........
+..#.......#..
+......S......
+...#.....#...
+........#....
+....#........
+.....#.#.....
+...........#.
+#............
+`
+
+// input = Deno.readTextFileSync("./src/inputs/day21.txt")
 
 interface Location extends Vector2 {
   key: string
@@ -87,8 +103,21 @@ for (let i = 0; i < maxi; i++) {
       if (considered.has(newKey)) return
       considered.add(newKey)
 
-      const lookupX = newPos.x > midPoint ? (newPos.x > midPoint ? newPos.x - gridSize : newPos.x) : (newPos.x < -midPoint ? gridSize + newPos.x : newPos.x)
-      const lookupY = newPos.y > midPoint ? (newPos.y > midPoint ? newPos.y - gridSize : newPos.y) : (newPos.y < -midPoint ? gridSize + newPos.y : newPos.y)
+      const lookupX = newPos.x === 0
+        ? 0
+        : newPos.x > midPoint
+          ? (newPos.x % gridSize) - midPoint
+          : newPos.x < -midPoint 
+            ? (newPos.x % gridSize) + midPoint 
+            : newPos.x
+      const lookupY = newPos.y === 0
+        ? 0
+        : newPos.y > midPoint
+          ? (newPos.y % gridSize) - midPoint
+          : newPos.y < -midPoint 
+            ? (newPos.y % gridSize) + midPoint 
+            : newPos.y
+
       const target = lookup[`${lookupX};${lookupY}`]
 
       if (!target) console.error("Found no target at newPos = ", newPos, " --- lookup:", lookupX, lookupY)
@@ -114,9 +143,25 @@ function draw() {
   for (let y = -displaySize; y <= displaySize; y++) {
     let line = ""
     for (let x = -displaySize; x <= displaySize; x++) {
-      const lookupX = x > midPoint ? (x > midPoint ? x - gridSize : x) : (x < -midPoint ? gridSize + x : x)
-      const lookupY = y > midPoint ? (y > midPoint ? y - gridSize : y) : (y < -midPoint ? gridSize + y : y)
+      
+      const lookupX = x === 0
+        ? 0
+        : x > midPoint
+          ? (x % gridSize) - midPoint
+          : x < -midPoint 
+            ? (x % gridSize) + midPoint 
+            : x
+      const lookupY = y === 0
+        ? 0
+        : y > midPoint
+          ? (y % gridSize) - midPoint
+          : y < -midPoint 
+            ? (y % gridSize) + midPoint 
+            : y
+
+
       const target = lookup[`${lookupX};${lookupY}`]
+      if (!target) console.error("Found no target to draw at = ", x, y, " --- lookup:", lookupX, lookupY, `(gridSize=${gridSize}, midPoint=${midPoint})`)
       line += options.find(o => o.x === x && o.y === y) ? "X" : target.char.replace(".", "·").replace("#", "█")
       // const cls = options.find(o => o.x === x && o.y === y) ? "o" : target.char.replace("#", "x").replace(".", "p")
       // line += `<div class="${cls}"></div>`
