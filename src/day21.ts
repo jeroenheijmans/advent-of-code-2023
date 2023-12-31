@@ -110,7 +110,7 @@ const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = 65
+const maxi = midPoint
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 
 // Enclosed spaces:
@@ -182,11 +182,10 @@ for (let y = -part2Steps; y <= part2Steps; y++) {
   const maxx = part2Steps - Math.abs(y)
   
   let dist = 0
-  const jumpAt = maxx % midPoint
 
   for (let x = -maxx; x <= maxx; x += 2) {
 
-    if (x < 0 && dist > jumpAt) x = maxx - dist
+    if (x < 0 && dist > midPoint) x = maxx - dist
     else dist++
 
     const lookupX = x > 0 ? ((x + midPoint) % gridSize) - midPoint : ((x - midPoint) % gridSize) + midPoint
@@ -230,5 +229,7 @@ function draw() {
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2, "(307324266398148 is 'too low')")
-
+// 307324266398148 too low
+// 307326513830219 "not the right answer"
+// 317881758271559 "not the right answer"
 finishDay()
