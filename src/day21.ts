@@ -110,7 +110,7 @@ const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = midPoint
+const maxi = midPoint * 3 + 1
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 
 // Enclosed spaces:
@@ -151,6 +151,7 @@ for (let i = 0; i < maxi; i++) {
 
   if (i === 63) part1 = options.length
 
+  if (i % midPoint === 0) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 0) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 6) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 10) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
@@ -162,7 +163,7 @@ for (let i = 0; i < maxi; i++) {
   if (i + 1 === 5000) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
 }
 
-const part2Steps = 26501365
+const part2Steps = midPoint * 3
 let part2 = 0
 
 // const oldOptions = options
@@ -176,6 +177,7 @@ const yToCountMap = options.map(o => o.y).reduce((result, next) => {
 
 for (let y = -part2Steps; y <= part2Steps; y++) {
   if (y % 1e6 === 0) console.log(y, new Date().toLocaleTimeString())
+
   const lookupY = y > 0 ? ((y + midPoint) % gridSize) - midPoint : ((y - midPoint) % gridSize) + midPoint
   const line = grid[lookupY + midPoint]
 
@@ -184,7 +186,6 @@ for (let y = -part2Steps; y <= part2Steps; y++) {
   let dist = 0
 
   for (let x = -maxx; x <= maxx; x += 2) {
-
     if (x < 0 && dist > midPoint) x = maxx - dist
     else dist++
 
@@ -228,8 +229,10 @@ function draw() {
 // console.log(options.filter(o => !oldOptions.some(o2 => o2.x === o.x && o2.y === o.y)))
 
 console.log("Part 1:", part1)
-console.log("Part 2:", part2, "(307324266398148 is 'too low')")
+console.log("Part 2:", part2)
 // 307324266398148 too low
+// 307324566398148 "not the right answer" now wait 10 minutes :'(
+// 307326404588351 "not the right answer"
 // 307326513830219 "not the right answer"
 // 317881758271559 "not the right answer"
 finishDay()
