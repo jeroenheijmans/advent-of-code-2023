@@ -72,7 +72,7 @@ let input = `
 // .....
 // `
 
-// input = Deno.readTextFileSync("./src/inputs/day21.txt")
+input = Deno.readTextFileSync("./src/inputs/day21.txt")
 
 interface Location extends Vector2 {
   key: string
@@ -106,13 +106,18 @@ const lookup = locations.reduce((result, next) => {
   return result
 }, {} as Record<string, Location>)
 
-
 const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = 501
+const maxi = 64
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
+
+// Enclosed spaces:
+locations.forEach(loc => {
+  if (directions.every(dir => lookup[`${loc.x + dir.dx};${loc.y + dir.dy}`]?.char === "#")) loc.char = "#"
+})
+
 let options = [start]
 let part1 = 0
 
@@ -151,10 +156,40 @@ for (let i = 0; i < maxi; i++) {
   if (i + 1 === 10) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 50) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 100) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
+  if (i + 1 === 250) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 500) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 1000) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
   if (i + 1 === 5000) console.log(`Step:\t${i+1}\tLength:\t${options.length}`)
-} 
+}
+
+const part2Steps = 26501365
+let part2 = 0
+
+// const oldOptions = options
+
+// options = []
+
+for (let y = -part2Steps; y <= part2Steps; y++) {
+  if (y % 1e6 === 0) console.log(y, new Date().toLocaleTimeString())
+  const lookupY = y > 0 ? ((y + midPoint) % gridSize) - midPoint : ((y - midPoint) % gridSize) + midPoint
+  const line = grid[lookupY + midPoint]
+
+  const maxx = part2Steps - Math.abs(y)
+  
+  let dist = 0
+  const includesJump = maxx > gridSize
+
+  for (let x = -maxx; x <= maxx; x += 2) {
+
+    if (includesJump && dist === midPoint) x = maxx - dist
+    dist++
+
+    const lookupX = x > 0 ? ((x + midPoint) % gridSize) - midPoint : ((x - midPoint) % gridSize) + midPoint
+    const cell = line[lookupX + midPoint]
+    if (cell.char === ".") part2++
+    // if (cell.char === ".") options.push({x,y})
+  }
+}
 
 function draw() {
   const displaySize = Math.ceil(maxi / midPoint) * midPoint
@@ -183,8 +218,9 @@ function draw() {
 }
 
 // draw()
+// console.log(options.filter(o => !oldOptions.some(o2 => o2.x === o.x && o2.y === o.y)))
 
 console.log("Part 1:", part1)
-console.log("Part 2:", 0, "(38893493797086 is 'too low')")
+console.log("Part 2:", part2, "(4414594481 is 'too low')")
 
 finishDay()
