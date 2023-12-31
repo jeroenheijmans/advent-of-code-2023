@@ -110,7 +110,7 @@ const location0 = locations.find(l => l.char === "S") as Location
 const start = { x: location0.x, y: location0.y }
 location0.char = "."
 
-const maxi = 64
+const maxi = 65
 const directions = [{dx:-1, dy:0},{dx:+1, dy:0},{dx:0, dy:-1},{dx:0, dy:+1}]
 
 // Enclosed spaces:
@@ -169,6 +169,11 @@ let part2 = 0
 
 // options = []
 
+const yToCountMap = options.map(o => o.y).reduce((result, next) => {
+  result[next] = (result[next] || 0) + 1
+  return result
+}, {} as Record<number, number>)
+
 for (let y = -part2Steps; y <= part2Steps; y++) {
   if (y % 1e6 === 0) console.log(y, new Date().toLocaleTimeString())
   const lookupY = y > 0 ? ((y + midPoint) % gridSize) - midPoint : ((y - midPoint) % gridSize) + midPoint
@@ -177,18 +182,21 @@ for (let y = -part2Steps; y <= part2Steps; y++) {
   const maxx = part2Steps - Math.abs(y)
   
   let dist = 0
-  const includesJump = maxx > gridSize
+  const jumpAt = maxx % midPoint
 
   for (let x = -maxx; x <= maxx; x += 2) {
 
-    if (includesJump && dist === midPoint) x = maxx - dist
-    dist++
+    if (x < 0 && dist > jumpAt) x = maxx - dist
+    else dist++
 
     const lookupX = x > 0 ? ((x + midPoint) % gridSize) - midPoint : ((x - midPoint) % gridSize) + midPoint
     const cell = line[lookupX + midPoint]
     if (cell.char === ".") part2++
     // if (cell.char === ".") options.push({x,y})
   }
+
+  const bonusLinesCount = Math.trunc(maxx / midPoint)
+  part2 += bonusLinesCount * yToCountMap[lookupY]
 }
 
 function draw() {
@@ -221,6 +229,6 @@ function draw() {
 // console.log(options.filter(o => !oldOptions.some(o2 => o2.x === o.x && o2.y === o.y)))
 
 console.log("Part 1:", part1)
-console.log("Part 2:", part2, "(4414594481 is 'too low')")
+console.log("Part 2:", part2, "(307324266398148 is 'too low')")
 
 finishDay()
