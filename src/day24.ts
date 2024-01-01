@@ -11,7 +11,7 @@ let input = `
 
 let min = 7, max = 27
 
-// input = Deno.readTextFileSync("./src/inputs/day24.txt"); min = 200000000000000; max = 400000000000000
+input = Deno.readTextFileSync("./src/inputs/day24.txt"); min = 200000000000000; max = 400000000000000
 
 const stones = input
   .trim()
@@ -63,24 +63,16 @@ while (uppert - lowert > 1) {
   else { uppert = middlet, upper = middle }
 }
 
-// Find stones that are closest at "lowert" because we presume
-// that finding the part2 ray is easiest starting from those
-const {stone0, stone1} = combinations
-  .map(([stone0, stone1]) => ({stone0, stone1, dist: getDistanceAt(lowert, stone0, stone1)}))
-  .toSorted((a, b) => b.dist - a.dist)
-  [0]
-
 const epsilon = 1e-5
 
 function collidesWithAllStones(bullet: Ray3D) {
-  if (stones.every(s => getShortestDistanceBetween(bullet, s) < epsilon)) {
-    return true
-  }
+  return stones.every(s => getShortestDistanceBetween(bullet, s) < epsilon)
 }
 
-function findBulletsFor(stone0: Ray3D, stone1: Ray3D) {
-  const bandwidth = 10
+function findBulletFor(stone0: Ray3D, stone1: Ray3D) {
+  const bandwidth = 1000
   for (let dt0 = -bandwidth; dt0 <= bandwidth; dt0++) {
+    // if (dt0 % 100 === 0) console.log(dt0, "at", new Date().toTimeString())
     const timeForStone0 = lowert + dt0
     if (timeForStone0 < 0) continue
 
@@ -114,7 +106,14 @@ function findBulletsFor(stone0: Ray3D, stone1: Ray3D) {
   }
 }
 
-const part2Bullet = findBulletsFor(stone0, stone1) || findBulletsFor(stone1, stone0)
+let part2Bullet: Ray3D | undefined
+let i = 0
+for (const [stone0, stone1] of combinations) {
+  if (++i % 1000 === 0) console.log("Testing combination", i, "of", combinations.length, "combinations, at", new Date().toTimeString())
+  part2Bullet = findBulletFor(stone0, stone1) || findBulletFor(stone1, stone0);
+  if (part2Bullet) break
+}
+
 const part2 = part2Bullet ? part2Bullet.x + part2Bullet.y + part2Bullet.z : 'not found'
 
 console.log("Part 1:", part1)
