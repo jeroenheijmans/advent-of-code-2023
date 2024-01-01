@@ -65,7 +65,40 @@ export function findRayIntersection(ray1: Ray2D, ray2: Ray2D): Vector2 | null {
   return null // rays do not intersect
 }
 
-export function getCombinations<T>(items: T[]) {
+export function getShortestDistanceBetween(ray1: Ray3D, ray2: Ray3D) {
+    // Vector between the origins of the two rays
+    const dx = ray1.x - ray2.x;
+    const dy = ray1.y - ray2.y;
+    const dz = ray1.z - ray2.z;
+
+    // Relative velocity vector
+    const dvx = ray1.vx - ray2.vx;
+    const dvy = ray1.vy - ray2.vy;
+    const dvz = ray1.vz - ray2.vz;
+
+    // Time parameter at the point of closest approach
+    const t = -(dx * dvx + dy * dvy + dz * dvz) / (dvx * dvx + dvy * dvy + dvz * dvz);
+
+    // Calculate the closest points on the two rays
+    const closestPointRay1X = ray1.x + ray1.vx * t;
+    const closestPointRay1Y = ray1.y + ray1.vy * t;
+    const closestPointRay1Z = ray1.z + ray1.vz * t;
+
+    const closestPointRay2X = ray2.x + ray2.vx * t;
+    const closestPointRay2Y = ray2.y + ray2.vy * t;
+    const closestPointRay2Z = ray2.z + ray2.vz * t;
+
+    // Calculate the distance between the closest points
+    const distance = Math.sqrt(
+        Math.pow(closestPointRay1X - closestPointRay2X, 2) +
+        Math.pow(closestPointRay1Y - closestPointRay2Y, 2) +
+        Math.pow(closestPointRay1Z - closestPointRay2Z, 2)
+    );
+
+    return distance;
+}
+
+export function getCombinations<T>(items: T[]): T[][] {
   const result: T[][] = []
   for (let i = 0; i < items.length; i++) {
     for (let j = i + 1; j < items.length; j++) {

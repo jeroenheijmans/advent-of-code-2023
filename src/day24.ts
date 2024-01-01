@@ -1,4 +1,4 @@
-import {startDay, finishDay, findRayIntersection, Ray3D, add, getCombinations} from './util.ts'
+import {startDay, finishDay, findRayIntersection, Ray3D, add, getCombinations, getShortestDistanceBetween} from './util.ts'
 startDay(24)
 
 let input = `
@@ -11,7 +11,7 @@ let input = `
 
 let min = 7, max = 27
 
-input = Deno.readTextFileSync("./src/inputs/day24.txt"); min = 200000000000000; max = 400000000000000
+// input = Deno.readTextFileSync("./src/inputs/day24.txt"); min = 200000000000000; max = 400000000000000
 
 const stones = input
   .trim()
@@ -34,6 +34,7 @@ function getPointAt(t: number, stone: Ray3D) {
     x: stone.x + stone.vx * t,
     y: stone.y + stone.vy * t,
     z: stone.z + stone.vz * t,
+    t,
   }
 }
 
@@ -62,10 +63,59 @@ while (uppert - lowert > 1) {
   else { uppert = middlet, upper = middle }
 }
 
-console.log("The center of 'mass' is between lower t =", lowert, "and upper t =", uppert)
-console.log("Not sure if that's worth anything though ¯\\_(ツ)_/¯")
+// Find stones that are closest at "lowert" because we presume
+// that finding the part2 ray is easiest starting from those
+const {stone0, stone1} = combinations
+  .map(([stone0, stone1]) => ({stone0, stone1, dist: getDistanceAt(lowert, stone0, stone1)}))
+  .toSorted((a, b) => b.dist - a.dist)
+  [0]
 
-const part2 = 0
+const epsilon = 1e-5
+
+function collidesWithAllStones(bullet: Ray3D) {
+  if (stones.every(s => getShortestDistanceBetween(bullet, s) < epsilon)) {
+    return true
+  }
+}
+
+function findBulletsFor(stone0: Ray3D, stone1: Ray3D) {
+  const bandwidth = 10
+  for (let dt0 = -bandwidth; dt0 <= bandwidth; dt0++) {
+    const timeForStone0 = lowert + dt0
+    if (timeForStone0 < 0) continue
+
+    for (let dt1 = dt0 + 1; dt1 <= bandwidth; dt1++) {
+      const timeForStone1 = lowert + dt1
+      
+      const stone0position = getPointAt(timeForStone0, stone0)
+      const stone1position = getPointAt(timeForStone1, stone1)
+      
+      const deltaTime = timeForStone1 - timeForStone0
+
+      const bullet = {
+        x: 0,
+        y: 0,
+        z: 0,
+        vx: (stone1position.x - stone0position.x) / deltaTime,
+        vy: (stone1position.y - stone0position.y) / deltaTime,
+        vz: (stone1position.z - stone0position.z) / deltaTime,
+      }
+
+      if (!Number.isInteger(bullet.vx)) continue
+      if (!Number.isInteger(bullet.vy)) continue
+      if (!Number.isInteger(bullet.vz)) continue
+
+      bullet.x = stone0position.x - (timeForStone0 * bullet.vx)
+      bullet.y = stone0position.y - (timeForStone0 * bullet.vy)
+      bullet.z = stone0position.z - (timeForStone0 * bullet.vz)
+
+      if (collidesWithAllStones(bullet)) return bullet
+    }
+  }
+}
+
+const part2Bullet = findBulletsFor(stone0, stone1) || findBulletsFor(stone1, stone0)
+const part2 = part2Bullet ? part2Bullet.x + part2Bullet.y + part2Bullet.z : 'not found'
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)
