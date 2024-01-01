@@ -34,15 +34,45 @@ export interface Vector3 extends Vector2 {
   z: number;
 }
 
-export interface Ray2 extends Vector2 {
+export interface Ray2D extends Vector2 {
   vx: number
   vy: number
 }
 
-export interface Ray3 extends Vector3 {
+export interface Ray3D extends Vector3 {
   vx: number
   vy: number
   vz: number
+}
+
+// I caved and asked ChatGPT for a ray intersection function...
+export function findRayIntersection(ray1: Ray2D, ray2: Ray2D): Vector2 | null {
+  const determinant = ray1.vx * ray2.vy - ray1.vy * ray2.vx
+
+  if (determinant === 0) return null // If determinant is 0, the rays are parallel and do not intersect
+
+  const t1 = ((ray2.x - ray1.x) * ray2.vy - (ray2.y - ray1.y) * ray2.vx) / determinant
+  const t2 = ((ray2.x - ray1.x) * ray1.vy - (ray2.y - ray1.y) * ray1.vx) / determinant
+
+  // Check if intersection point is within the rays
+  if (t1 >= 0 && t2 >= 0) {
+    return {
+      x: ray1.x + t1 * ray1.vx,
+      y: ray1.y + t1 * ray1.vy,
+    }
+  }
+
+  return null // rays do not intersect
+}
+
+export function getCombinations<T>(items: T[]) {
+  const result: T[][] = []
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      result.push([items[i], items[j]])
+    }
+  }
+  return result
 }
 
 export function add(a: number, b: number) {
