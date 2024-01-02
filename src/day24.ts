@@ -1,4 +1,4 @@
-import {startDay, finishDay, findRayIntersection, Ray3D, add, getCombinations, getShortestDistanceBetween} from './util.ts'
+import {startDay, finishDay, findRay2DIntersection, Ray3D, add, getCombinations, getShortestDistanceBetween} from './util.ts'
 startDay(24)
 
 let input = `
@@ -25,10 +25,10 @@ const stones = input
 const combinations = getCombinations(stones)
 
 const part1 = combinations
-  .map(([stone1, stone2]) => findRayIntersection(stone1, stone2))
+  .map(([stone1, stone2]) => findRay2DIntersection(stone1, stone2))
   .filter(i => !!i && i.x >= min && i.x <= max && i.y >= min && i.y <= max)
   .length
-
+ 
 function getPointAt(t: number, stone: Ray3D) {
   return {
     x: stone.x + stone.vx * t,
@@ -49,53 +49,67 @@ function getSummedDistanceAt(t: number) {
 }
 
 let lowert = 0
-let uppert = 1e12
+let uppert = 1e20
 let lower = getSummedDistanceAt(lowert)
 let upper = getSummedDistanceAt(uppert)
 
 while (uppert - lowert > 1) {
   const middlet = lowert + Math.trunc((uppert - lowert) / 2)
   const middle = getSummedDistanceAt(middlet)
-  const half1 = middle - lower
+  const half1 = lower - middle
   const half2 = upper - middle
   
   if (half1 > half2) { lowert = middlet, lower = middle }
   else { uppert = middlet, upper = middle }
 }
 
-const epsilon = 1e-5
+console.log(lowert)
 
+const epsilon = 1e-10
 function collidesWithAllStones(bullet: Ray3D) {
   return stones.every(s => getShortestDistanceBetween(bullet, s) < epsilon)
 }
 
+// For Wolfram Mathematica
+// console.log("Graphics3D[{")
+// stones
+//   .slice(0, 30)
+//   .map(s => [getPointAt(0, s), getPointAt(lowert * 2, s)])
+//   .forEach(([p0, p1]) => console.log(`Arrow[{{${p0.x},${p0.y},${p0.z}}, {${p1.x},${p1.y},${p1.z}}}],`))
+// console.log("}, ImageSize -> Large]")
+
 function findBulletFor(stone0: Ray3D, stone1: Ray3D) {
-  const bandwidth = 1000
-  for (let dt0 = -bandwidth; dt0 <= bandwidth; dt0++) {
-    // if (dt0 % 100 === 0) console.log(dt0, "at", new Date().toTimeString())
-    const timeForStone0 = lowert + dt0
+  const bandwidth0 = 10000, bandwidth1 = 500
+  for (let dt0 = -bandwidth0; dt0 <= bandwidth0; dt0++) {
+    // if (dt0 % 100000 === 0) console.log("   ", dt0, "at", new Date().toTimeString())
+    const timeForStone0 = lowert + dt0 // It's a guess that around "lowert" things happen
     if (timeForStone0 < 0) continue
 
-    for (let dt1 = dt0 + 1; dt1 <= bandwidth; dt1++) {
-      const timeForStone1 = lowert + dt1
+    for (let dt1 = 0; dt1 <= bandwidth1; dt1++) {
+      const timeForStone1 = dt1 // It's a guess that around "lowert" things happen
+      if (timeForStone1 === timeForStone0) continue // Two stones will never collide themselves
+      if (timeForStone1 < 0) continue
       
       const stone0position = getPointAt(timeForStone0, stone0)
       const stone1position = getPointAt(timeForStone1, stone1)
       
-      const deltaTime = timeForStone1 - timeForStone0
+      const deltaT = timeForStone1 - timeForStone0
+      const deltaX = stone1position.x - stone0position.x
+      const deltaY = stone1position.y - stone0position.y
+      const deltaZ = stone1position.z - stone0position.z
+
+      if (deltaX % deltaT !== 0) continue
+      if (deltaY % deltaT !== 0) continue
+      if (deltaZ % deltaT !== 0) continue
 
       const bullet = {
         x: 0,
         y: 0,
         z: 0,
-        vx: (stone1position.x - stone0position.x) / deltaTime,
-        vy: (stone1position.y - stone0position.y) / deltaTime,
-        vz: (stone1position.z - stone0position.z) / deltaTime,
+        vx: deltaX / deltaT,
+        vy: deltaY / deltaT,
+        vz: deltaZ / deltaT,
       }
-
-      if (!Number.isInteger(bullet.vx)) continue
-      if (!Number.isInteger(bullet.vy)) continue
-      if (!Number.isInteger(bullet.vz)) continue
 
       bullet.x = stone0position.x - (timeForStone0 * bullet.vx)
       bullet.y = stone0position.y - (timeForStone0 * bullet.vy)
@@ -108,13 +122,17 @@ function findBulletFor(stone0: Ray3D, stone1: Ray3D) {
 
 let part2Bullet: Ray3D | undefined
 let i = 0
+
 for (const [stone0, stone1] of combinations) {
-  if (++i % 1000 === 0) console.log("Testing combination", i, "of", combinations.length, "combinations, at", new Date().toTimeString())
+  if (++i % 1000 === 0) 
+    console.log("Testing combination", i, "of", combinations.length, "combinations, at", new Date().toTimeString())
   part2Bullet = findBulletFor(stone0, stone1) || findBulletFor(stone1, stone0);
   if (part2Bullet) break
 }
 
-const part2 = part2Bullet ? part2Bullet.x + part2Bullet.y + part2Bullet.z : 'not found'
+console.log("Part 2 bullet:", part2Bullet, "\n")
+
+const part2 = part2Bullet ? part2Bullet.x + part2Bullet.y + part2Bullet.z : undefined
 
 console.log("Part 1:", part1)
 console.log("Part 2:", part2)

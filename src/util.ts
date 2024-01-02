@@ -46,7 +46,7 @@ export interface Ray3D extends Vector3 {
 }
 
 // I caved and asked ChatGPT for a ray intersection function...
-export function findRayIntersection(ray1: Ray2D, ray2: Ray2D): Vector2 | null {
+export function findRay2DIntersection(ray1: Ray2D, ray2: Ray2D): Vector2 | null {
   const determinant = ray1.vx * ray2.vy - ray1.vy * ray2.vx
 
   if (determinant === 0) return null // If determinant is 0, the rays are parallel and do not intersect
